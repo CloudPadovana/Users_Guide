@@ -682,6 +682,15 @@ To resize a VM using the Horizon graphical Interface:
 
 <para>
 <itemizedlist>
+<listitem><para>
+Detach any attached volume as decribed in <xref linkend="DetachVolume"/>
+</para>
+<warning><para>
+Failure in doing so might lead to VM and/or Volume corruption!
+</para></warning>
+</listitem>
+
+
 <listitem><para>Select the <menuchoice><guimenu>Instances</guimenu></menuchoice> 
 menu and the <menuchoice><guimenu>Resize Instance</guimenu></menuchoice> 
 option on the actions.
