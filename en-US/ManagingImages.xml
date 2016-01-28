@@ -402,7 +402,31 @@ relevant users in /etc/passwd and create their home directories.
 
 </section>
 
+<section id="DeletingImages">
+<title>Deleting Images</title>
+<para>
+Images that are not used anymore can be deleted. 
+Deletion of images is permanent and cannot be reversed. 
+</para>
 
+<para>
+To delete an update, Log in to the dashboard. Then 
+select the appropriate project from the drop down menu at the top left.
+On the Project tab, open the Compute tab and click <literal>Images</literal> 
+category.
+Then select the images that you want to delete.
+Then click <literal>Delete Images</literal>.
+In the <literal>Confirm Delete Images</literal> dialog box, click 
+<literal>Delete Images</literal> to confirm the deletion.
+</para>
+
+<warning><para>
+Don't delete an image if are there are virtual machines created using this
+image, otherwise these VMs won't be able to start if hard rebooted.
+</para></warning>
+
+
+</section>
 
 
 </chapter>
