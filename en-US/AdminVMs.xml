@@ -51,7 +51,8 @@ button. A new menu appears.
 
 <mediaobject>
 <imageobject>
-  <imagedata fileref="./images/launchinstance.png" />
+  <imagedata condition="pdf" fileref="./images/launchinstances.png" width="450"/>
+  <imagedata condition="web" fileref="./images/launchinstances.png" />
 </imageobject>
 </mediaobject>
 
