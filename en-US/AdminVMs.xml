@@ -62,6 +62,55 @@ Here you can enter:
 
 <itemizedlist>
 
+<listitem>
+
+<para>
+<menuchoice><guimenu>Availability Zone</guimenu></menuchoice> defines where (in which part of
+the Cloud infrastructure) the Virtual Machine should be created. 
+</para>
+
+<para>
+You may choose among <replaceable>nova</replaceable> and 
+<replaceable>novaLiveMigration</replaceable>. 
+</para>
+
+<para>
+The availability zone <replaceable>novaLiveMigration</replaceable> comprises a small set
+of Cloud compute nodes supporting Live Migration: thanks to 
+a shared file system used to host instances, if a compute node of this zone has to be 
+switched off (e.g. for maintenance), the Cloud admin can move the VMs hosted by this compute node 
+on other compute nodes of the same zone, basically without any service interruption.
+Please use this availability zone <literal>only</literal> for critical services (e.g. NFS servers).
+Virtual Machines hosted on the 'novaLiveMigration' availability zone have slightly worst 
+performance wrt Virtual Machines hosted on the 'nova' availability zone. 
+</para>
+
+<para>
+For less critical instances (e.g. worker nodes that can be easily recreated in case of fault)
+the <replaceable>nova</replaceable> availability zone should be used. 
+In this case the VMs are instantiated using the local storage of the relevant Cloud 
+compute nodes.
+
+If a compute node of this zone has to be 
+switched off (e.g. for maintenance), the VMs hosted on this compute node must be first migrated
+to other compute nodes. But in this case these VMs must be switched off, and won't be available
+for some minutes.
+Virtual Machines hosted on the 'nova' availability zone have slightly better
+performance wrt Virtual Machines hosted on the 'novaLiveMigration' availability zone. 
+
+</para>
+
+<mediaobject>
+<imageobject>
+  <imagedata condition="pdf" fileref="./images/availability_zones.png" width="450"/>
+  <imagedata condition="web" fileref="./images/availability_zones.png" />
+</imageobject>
+</mediaobject>
+
+
+</listitem>
+
+
 <listitem><para>
 <menuchoice><guimenu>Instance name</guimenu></menuchoice> is the name of the 
 machine you want to create. 
@@ -96,7 +145,8 @@ Switch the tab for
 
 <mediaobject>
 <imageobject>
-  <imagedata fileref="./images/launch-accesssec.png" />
+  <imagedata condition="pdf" fileref="./images/launch-accesssec.png" width="450"/>
+  <imagedata condition="web" fileref="./images/launch-accesssec.png" />
 </imageobject>
 </mediaobject>
 
@@ -138,7 +188,8 @@ Swith the tab for <menuchoice><guimenu>Networking</guimenu></menuchoice>.
 
 <mediaobject>
 <imageobject>
-  <imagedata fileref="./images/launch-net.png" />
+  <imagedata condition="pdf" fileref="./images/launch-net.png" width="450"/>
+  <imagedata condition="web" fileref="./images/launch-net.png" />
 </imageobject>
 </mediaobject>
 

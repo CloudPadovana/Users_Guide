@@ -380,8 +380,9 @@ an e-mail such as this one:
 
 
 <para>
-To manage such requests, open the OpenStack web dashboard, log in, and then 
-click on
+To manage such requests, open the OpenStack web dashboard, i.e. go to 
+<ulink url="https://cloud-areapd.pd.infn.it/dashboard">https://cloud-areapd.pd.infn.it/dashboard</ulink> in a browser. Log in (either using the INFN-AAI credentials, or using the username and password)
+and then click on
 <menuchoice><guimenu>Subscriptions</guimenu></menuchoice> (on the bottom-left).
 An image such as the following one, with the list of the pending requests,
 will appear.
