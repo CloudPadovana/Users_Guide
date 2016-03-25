@@ -27,10 +27,14 @@ storage is defined in the virtual machine flavor.
 particular instance. Volumes may be attached to a single instance at a time, 
 but may be detached or re-attached to a different instance while retaining 
 all data, much like a USB drive. The size of the volume can be selected when 
-it is created within the quota limits for the particular project.
+it is created within the quota limits for the particular project. Please also consider that
+in the Cloud Area Padovana volumes are implemented through storage systems which are more
+reliable than the ones used for ephemeral storage.
 </para></listitem>
 
 </itemizedlist>
+
+
 
 </para>
 
