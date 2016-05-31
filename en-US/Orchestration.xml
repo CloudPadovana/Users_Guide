@@ -233,7 +233,49 @@ The Heat Orchestration Template (HOT) specification is available
 <title>Creating a stack</title>
 
 <para>
-xx
+To create a stack using the browser please select the 
+<menuchoice><guimenu>Orchestration</guimenu></menuchoice> menu 
+and choose <menuchoice><guimenu>Stacks</guimenu></menuchoice>.
+</para>
+
+<mediaobject>
+<imageobject>
+  <imagedata condition="pdf" fileref="./images/stacks.png" width="450"/>
+  <imagedata condition="web" fileref="./images/stacks.png" />
+</imageobject>
+</mediaobject>
+
+
+
+<para>
+Then click <menuchoice><guimenu>Launch Stack</guimenu></menuchoice>.
+You will be prompted to select a template.
+</para>
+
+<mediaobject>
+<imageobject>
+  <imagedata condition="pdf" fileref="./images/launchstack.png" width="450"/>
+  <imagedata condition="web" fileref="./images/launchstack.png" />
+</imageobject>
+</mediaobject>
+
+
+<para>
+You will then be asked to fill in the parameters of the template and launch 
+the stack.
+</para>
+
+
+<mediaobject>
+<imageobject>
+  <imagedata condition="pdf" fileref="./images/launch_param.png" width="450"/>
+  <imagedata condition="web" fileref="./images/launch_param.png" />
+</imageobject>
+</mediaobject>
+
+
+<para>
+Then you can follow the status of your stack on the dashboard.
 </para>
 
 </section>
