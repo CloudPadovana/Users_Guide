@@ -341,9 +341,15 @@ site</ulink>. The certificate can also be downloaded from the
 site</ulink>.
 </para>
 
+
 <para>
 To test it works, run the rc script source file and enter your password to 
-authenticate. The OpenStack command line tools (nova for compute resources, 
+authenticate. To set/change your password, please refer to 
+<xref linkend="SettingPassword"/>
+</para>
+
+<para>
+The OpenStack command line tools (nova for compute resources, 
 glance for images) can then be used, etc:
 </para>
 <screen>

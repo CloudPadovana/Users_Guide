@@ -351,8 +351,18 @@ To do that, it is enough to log on the VM and:
 cd /
 tar xvf / path/ldap.tar
 </screen>
+</para>
+
+<para>
+Make sure that the following links exist:
+
+<screen>
+/etc/pam.d/password-auth -> password-auth-ac
+/etc/pam.d/system-auth -> system-auth-ac
+</screen>
 
 </para>
+
 
 <para>
 Then it is necessary to start the nslcd and nscd services:
