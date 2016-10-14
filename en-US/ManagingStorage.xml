@@ -244,12 +244,22 @@ mount /dev/sdb /dataNfs
 </para>
 
 <para>
-Ensure that on this virtual machine the follow packages are installed:
+Ensure that on this virtual machine the needed packages are installed. For RHEL 6 based systems these are:
 <screen>
 nfs-utils
 nfs-utils-lib
 rpcbind
 </screen>
+</para>
+
+
+<para> 
+For RHEL 7 based systems these are:
+
+<screen>
+nfs-utils
+rpcbind 
+</screen> 
 </para>
 
 <para>
@@ -266,35 +276,8 @@ should be:
 <para>
 Check the firewall on the virtual machine. Ensure that the other instances
 can access to ports 111, 2049, 875 UPD and TCP.
-So considering iptables, the /etc/sysconfig/iptables file should be 
-something like this:
-<screen>
-*filter
-:INPUT ACCEPT [0:0]
-:FORWARD ACCEPT [0:0]
-:OUTPUT ACCEPT [0:0]
--A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
--A INPUT -p icmp -j ACCEPT
--A INPUT -i lo -j ACCEPT
--A INPUT -m state --state NEW -m tcp -p tcp --dport 22 -j ACCEPT
--A INPUT -m state --state NEW -m tcp -p tcp --dport 111 -j ACCEPT
--A INPUT -m state --state NEW -m udp -p udp --dport 111 -j ACCEPT
--A INPUT -m state --state NEW -m tcp -p tcp --dport 875 -j ACCEPT
--A INPUT -m state --state NEW -m udp -p udp --dport 875 -j ACCEPT
--A INPUT -m state --state NEW -m tcp -p tcp --dport 2049 -j ACCEPT
--A INPUT -m state --state NEW -m udp -p udp --dport 2049 -j ACCEPT
--A INPUT -j REJECT --reject-with icmp-host-prohibited
--A FORWARD -j REJECT --reject-with icmp-host-prohibited
-COMMIT
-</screen>
 </para>
 
-<para>
-Please remember to restart iptables after any change on that file:
-<screen>
-service iptables restart
-</screen>
-</para>
 
 <para>
 Check the security group (see <xref linkend="SecurityGroups"/>): 
@@ -309,9 +292,25 @@ access to ports 111, 875 and 2049
 </para>
 
 <para>
-Restart nfs server:
+(Re)start the relevant services. For RHEL 6 based systems:
+
 <screen>
 service nfs restart
+</screen>
+</para>
+
+<para>
+For RHEL 7 based systems:
+
+<screen>
+systemctl enable rpcbind
+systemctl enable nfs-server
+systemctl enable nfs-lock
+systemctl enable nfs-idmap
+systemctl start rpcbind
+systemctl restart nfs-server
+systemctl restart nfs-lock
+systemctl restart nfs-idmap 
 </screen>
 </para>
 
