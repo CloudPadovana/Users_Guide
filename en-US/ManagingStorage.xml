@@ -162,7 +162,7 @@ Mount the volume:
 </para>
 
 <screen>
-mount /dev/sdb /mnt
+mount /dev/vdb /mnt
 </screen>
 
 </section>
