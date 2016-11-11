@@ -55,16 +55,23 @@ alias ec2-bundle-image="ec2-bundle-image --cert ${EC2_CERT} --privatekey ${EC2_P
 alias ec2-upload-bundle="ec2-upload-bundle -a ${EC2_ACCESS_KEY} -s ${EC2_SECRET_KEY} --url ${S3_URL} --ec2cert ${NOVA_CERT}"
 </screen>
 where EC2_ACCESS_KEY and EC2_SECRET_KEY are different for each project and user. The elastiq service uses these values to instantiate and to kill VMs in the specific project.
-</para></listitem>
-<listitem><para>
-In order to access in the master and slave nodes as root you need to have a key. 
-To create a key pairs from dashboard see <xref linkend="CreatingAKeypair"/>.
-</para></listitem>
+	</para></listitem>
+	<listitem><para>
+		If you want to use nova cli to instantiate your master you have to download the <literal>&lt;project_name&gt;</literal>-openrc.sh file of the project you want to use.
+		You can download them from the dashboard as following:
+		</para>
+		<para>
+		open the dashboard, select the experiment (drop down menu on top left of the dashboard), go to Access &amp; Security (under Compute section), go in Api Access section and here click on [Download OpenStack RC file].
+	</para></listitem>
+	<listitem><para>
+		In order to access in the master and slave nodes as root you need to have a key. 
+		To create a key pairs from dashboard see <xref linkend="CreatingAKeypair"/>.
+	</para></listitem>
 
-<listitem><para>
-You need an appropriate security group for the master node containing the following rules:
-</para>
-<screen>
+	<listitem><para>
+		You need an appropriate security group for the master node containing the following rules:
+		</para>
+		<screen>
 Direction    Ether Type    IP Protocol    Port Range         Remote IP Prefix
 Egress       IPv4          Any            Any                0.0.0.0/0	
 Egress       IPv6          Any            Any                ::/0	
@@ -72,86 +79,52 @@ Ingress      IPv4          ICMP           Any                0.0.0.0/0
 Ingress      IPv4          TCP            22 (SSH)           0.0.0.0/0	
 Ingress      IPv4          TCP            9618               0.0.0.0/0	
 Ingress      IPv4          TCP            41000 - 42000      0.0.0.0/0
-</screen>
-<note><para>
-Instead of managing the rules of an existing security group, we suggest to create a new security group named e.g. "master_security_group" as explained in <xref linkend="SecurityGroups"/>.
-</para></note>
-<para>
-The slave nodes will instead use the <literal>default</literal> security group of your project. This group must include the following rule: 
-<screen>
+		</screen>
+		<note><para>
+		Instead of managing the rules of an existing security group, we suggest to create a new security group named e.g. "master_security_group" as explained in <xref linkend="SecurityGroups"/>.
+		</para></note>
+		<para>
+		The slave nodes will instead use the <literal>default</literal> security group of your project. This group must include the following rule: 
+		<screen>
 Direction  Ether Type  IP Protocol  Port Range   Remote IP Prefix   Remote Security Group
 Ingress    IPv4        Any          Any          -                 <literal>&lt;master_security_group&gt;</literal> 
-</screen>
-</para>
-<para>Where <literal>&lt;master_security_group&gt;</literal> is the name of the security group that you chose for the master node.</para> 
-</listitem>
+		</screen>
+		</para>
+		<para>Where <literal>&lt;master_security_group&gt;</literal> is the name of the security group that you chose for the master node.</para> 
+	</listitem>
 
-<listitem><para>
-You need to prepare a user_data.txt file containing all the required parameters for master and slaves, as explained in <xref linkend="ClusterConfiguration"/>.
-</para></listitem>
+	<listitem><para>
+	You need to download <ulink url="https://github.com/CloudPadovana/ECM.git">ECM</ulink> software and use it to configure your user_data_file.
+		<screen>
+$ git clone https://github.com/CloudPadovana/ECM.git
+		</screen>
+This is explained in more detail in <xref linkend="ClusterConfiguration"/>.
+	</para></listitem>
 
-<listitem><para>
-In order to instantiate the cluster you have to use a uCernVM based image for master node and slave nodes. The uCernVM are SL6.x based images with CVMFS.
-<note><para>
-If you want to use some specific software in your master and slave nodes that is not included in the default uCernVM image, you can create a new image by:
-<itemizedlist>
-<listitem><para> creating a VM using a uCernVM image</para></listitem>
-<listitem><para> customizing it (e.g. installing the missing packages)</para></listitem>
-<listitem><para> doing a snapshot, and therefore creating the required image.</para></listitem>
-</itemizedlist>
-This is explained in more detail in <xref linkend="SnapshottingVMs"/>. In this way you will have in your VMs all the software that you need.
-</para></note>
-</para></listitem>
+	<listitem><para>
+		In order to instantiate the cluster you have to use a uCernVM, SL6.x or Ubuntu based image for master node and slave nodes. The uCernVM are SL6.x based images with CVMFS.
+		<note><para>
+		If you want to use some specific software in your master and slave nodes that is not included in the default image, you can create a new image by:
+		<itemizedlist>
+			<listitem><para> creating a VM using a uCernVM image</para></listitem>
+			<listitem><para> customizing it (e.g. installing the missing packages)</para></listitem>
+			<listitem><para> doing a snapshot, and therefore creating the required image.</para></listitem>
+		</itemizedlist>
+		This is explained in more detail in <xref linkend="SnapshottingVMs"/>. In this way you will have in your VMs all the software that you need.
+		</para></note>
+	</para></listitem>
 </itemizedlist>
 
 </para>
 </section>
 
-
 <section id="ClusterConfiguration">
 <title>The cluster configuration</title>
 
 <para>
-For the cluster configuration you need to know the following parameters:
-
-<itemizedlist>
-<listitem><para>
-the <literal>EC2_ACCESS_KEY</literal> and <literal>EC2_SECRET_KEY</literal> of project where you want to instantiate the cluster
-</para></listitem>
-
-<listitem><para>
-the <literal>flavor</literal> to apply on master and slaves which can have different profiles. You can use whatever you like, according with the image or snapshot you want to use.
-Available flavor are listed in the dashboard when you try to launch a VM and in each project are called "cldareapd".medium, small, large, etc. Two useful flavors are the following:
-<itemizedlist>
-<listitem><para><literal>flavour=cldareapd.small</literal></para>
-<para> with 1 VCPU, 2GB RAM and 20GB Root Disk</para></listitem>
-<listitem><para><literal>flavour=cldareapd.medium</literal></para>
-<para> with 2 VCPU, 4GB RAM and 25GB Root Disk</para></listitem>
-</itemizedlist>
-<note><para>
-The batch system will use each CPU as a separate slot, then if you have a flavour with, say, 4 cpu, and you submit 1 job, the master will create 1 slave and use 1 of the 4 available CPUs. If you submit 4 jobs, again the master will create 1 slave, and use all the 4 CPUs. Large flavour means less machines to be created but possibly a
-sub-optimal usage of resources.
-</para></note>
-
-</para></listitem>
-
-<listitem><para>
-the <literal>id of the image or of the snapshot</literal> to use for nodes.
-The master image can be selected in the dashboard when you will launch the VM but the id of image or snapshot for slaves has to be known in EC2 format.
-<itemizedlist>
-<listitem><para>The id of a simple uCernVM 2.3.0 (SL6.7, with cvmfs) is <literal>image_id=ami-0000031b</literal></para></listitem>
-<listitem><para>The id of a simple uCernVM 3.4.3 is <literal>image_id=ami-0000028b</literal></para></listitem>
-<listitem><para>The id of a uCernVM 2.3.0 with padova LDAP server is <literal>image_id=ami-00000447</literal></para></listitem>
-</itemizedlist>
+You can use ecm.py into ECM directory to configure and instantiate your elastiq cluster.
+You can choose from some public images without knowning their id in EC2 format, but if you want to use a snapshot or a different image your have to know its id.
 </para>
-
-<warning><para>
-To instantiate a VM (master or slave nodes) with snapshot ami-00000447 is necessary a cldareapd.medium flavor.
-</para></warning>
-</listitem>
-</itemizedlist>
-
-
 <important><para>
 No way to get the EC2 image_ID from dashboard, it can be known only using euca2ools installed on some machine (see <xref linkend="EucaCommands"/>).
 </para></important>
@@ -159,214 +132,191 @@ No way to get the EC2 image_ID from dashboard, it can be known only using euca2o
 The version of euca2ool that works with our production cloud is an old version 2.x.
 See <xref linkend="EucaCommands"/> to find instruction about how to install euca2ools and how to use euca commands.
 </para></warning>
-
-Now with these four infos you can create your configuration file as the following one. You can copy or download this <ulink url="https://drive.google.com/open?id=0BxTCRyOJIhYjZTc2SG40TFhqUWM"> user_data_file.txt</ulink> and use it after changing a small number of parameters.
-
-<important><para>
-You have to verify that the number of jobs per VM is compatible with the number of VCPU of the selected flavor.
-</para></important>
-
-<screen>
-# cat user_data_file.txt
-[amiconfig]
-plugins=elastiq-setup condor
-
-[condor]
-use_ips=true
-highport=42000
-condor_user=condor
-lowport=41000
-condor_secret=12345
-condor_group=condor
-uid_domain=*
-
-[elastiq-setup]
-elastiq_check_queue_every_s=15
-elastiq_idle_for_time_s=3600
-
-elastiq_waiting_jobs_time_s=100
-elastiq_n_jobs_per_vm=2
-elastiq_batch_plugin=htcondor
-elastiq_estimated_vm_deploy_time_s=600
-elastiq_check_vms_every_s=45
-
-ec2_api_url=https://cloud-areapd.pd.infn.it:8773/services/Cloud
-ec2_aws_secret_access_key=<literal>&lt;secret_key&gt;</literal>
-ec2_aws_access_key_id=<literal>&lt;access_key&gt;</literal>
-ec2_image_id=<literal>&lt;ami-id&gt;</literal>
-ec2_flavour=<literal>&lt;flavor_name&gt;</literal>
-
-ec2_user_data_b64=W2FtaWNvbmZpZ10NCnBsdWdpbnM9Y29uZG9yIHZhZi1zZXR1cA0KDQpbY29uZG9yXQ0KdXNlX2l
-wcz10cnVlDQpoaWdocG9ydD00MjAwMA0KY29uZG9yX3VzZXI9Y29uZG9yDQpsb3dwb3J0PTQxMDAwDQpjb25kb3Jfc2Vj
-cmV0PTEyMzQ1DQpjb25kb3JfbWFzdGVyPSVpcHY0JQ0KY29uZG9yX2dyb3VwPWNvbmRvcg0KdWlkX2RvbWFpbj0qDQoNC
-lt2YWYtc2V0dXBdDQpub2RlX3R5cGU9c2xhdmUNCg==
-
-cacerts_b64=LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tDQpNSUlGd2pDQ0E2cWdBd0lCQWdJSkFMTW1Bc1o5U1NZb
-k1BMEdDU3FHU0liM0RRRUJDd1VBTUVNeEN6QUpCZ05WDQpCQVlUQWtsVU1RMHdDd1lEVlFRS0V3UkpUa1pPTVNVd0l3WU
-RWUVFERXh4SlRrWk9JRU5sY25ScFptbGpZWFJwDQpiMjRnUVhWMGFHOXlhWFI1TUI0WERURTFNVEF3TmpFd01qSXdOVm9
-YRFRNd01UQXdOakV3TWpJd05Wb3dRekVMDQpNQWtHQTFVRUJoTUNTVlF4RFRBTEJnTlZCQW9UQkVsT1JrNHhKVEFqQmdO
-VkJBTVRIRWxPUms0Z1EyVnlkR2xtDQphV05oZEdsdmJpQkJkWFJvYjNKcGRIa3dnZ0lpTUEwR0NTcUdTSWIzRFFFQkFRV
-UFBNElDRHdBd2dnSUtBb0lDDQpBUURpWGRSN2tmSzdkcWM1dFFDRFozWUtEODlGaXpHRmhvMnBCeHpkZFVtalZFYkVCZU
-9tRy8veks0Rm1Ca3U4DQozU1RpZDNZbVlPY01NZjhDMG5BVkdrdGRqdzJocVlWalArcHc3bW5tV0ZvZy9tTk1rdy9RNy9
-hdkxlb2lZOEkrDQpwSnRXS1BDYmhUWkluSzU5ay9LY0xzN2JyYXVWNCtmQkJwMnZzY09wTThqNFk2VEg3TUFKTHNyWWRk
-emd4Q29FDQpJdmpaNWNSWGNQSERON24yV2hvak43MFh0bFFmaFlOalVsU0dJb3FkVlhPRUtWQkVHNzRPbGc4ODhBR2VvR
-lB4DQpTYzVGYUxsTTBHZUtMZ1JZWXREVXU4dEdNZGhNZENUZ1JUNTE1UDM2djQxUDdLNHdaR01leFJiNGw3Qk1IVk5mDQ
-psamxWcWpyOEwyZjJnNER5MjFIWkREbEZmY29xNlZ6bHRjRHBGM3M4bzUvcjNlUWlHVldUU1MxSlhKcFhMSlRjDQpkdmo
-0cTZoUFFFc2RreUgyYXFjdlMwNk4yWFdXRzI3bnAwSnpWc2lwQVA5V1JZeUxBSk8rRVR0d09PdnF0YWtGDQo3SnJQME5i
-Nmp5U1JQeS9RbWZZK2pLbXdmNmhKM1dIcS84LzZHcjFWUlRxMHNpK1pDNDZuWTg5cFlmKytRTEtrDQpjZ2U3dUt2ZGR4Z
-XBvTFY5M0h4L0dNR2M5NmpBdEQvUjRYY1JmUmpPLzErOXJ3Qk9YWk5MZU5Wb0Q1ZUNqK0FkDQpOREYxTUwvWWE4R3YzQU
-9WSk5jeUFjTTE0NVZiRnBoWndrU1RoM005RFJCS1RxeVFJQlZWQUY3NWNwa1UxM3FhDQpkUUJRUU9oaUZBWkNTU3hMRzZ
-JcTBsVzVLc2ZRcUhkMTNYYVNvclBJVi9wODB3SURBUUFCbzRHNE1JRzFNQThHDQpBMVVkRXdFQi93UUZNQU1CQWY4d0Rn
-WURWUjBQQVFIL0JBUURBZ0VHTUIwR0ExVWREZ1FXQkJSRGpFMys3SmJLDQo2ZThLcEgzQm5RTGxuNzJXZ0RCekJnTlZIU
-01FYkRCcWdCUkRqRTMrN0piSzZlOEtwSDNCblFMbG43MldnS0ZIDQpwRVV3UXpFTE1Ba0dBMVVFQmhNQ1NWUXhEVEFMQm
-dOVkJBb1RCRWxPUms0eEpUQWpCZ05WQkFNVEhFbE9SazRnDQpRMlZ5ZEdsbWFXTmhkR2x2YmlCQmRYUm9iM0pwZEhtQ0N
-RQ3pKZ0xHZlVrbUp6QU5CZ2txaGtpRzl3MEJBUXNGDQpBQU9DQWdFQXowbmVjMHN0R3kzMCtoTlJONTJOaTVZWUNNRkZv
-WDRhRDdMZHJXdCtNVDg2aTRVRnp2UFJ3dk9wDQpiUGNQQzYzc2pRYlAramVQZ0ZYc21FYVBrREt1ZjB4MzQ0bE55QWdJV
-StKRldpbmM0Z3Y0bk41b0hmdVNYRzZKDQpVVGZZTEhhVnVQYWhLZUhVVXBCT3l0eU9NRFJLRytGbEdPeFF2aG5vaGhqVX
-dCZmZidTFGSXU5OTMrZDB3MkdDDQo5WjR6VCtHVUtTbHZpT1VZYnpjdER1RzBEOEZWV0pLN0w1U3NqRlNQU2ZDSmxiV0t
-HbWRwRE5WMnZOemthSHNBDQpkUTEzV3F4RThiMEpUSGRwUzN2c3J2ZlNlaFk0SUc0RmoySHFzREUvZGZsSDNnY0piNWw0
-bHM4a2NBNTNZUkcyDQpORFRqdmpkcTN0djVBbFlKekhLY3hxMXZoVW1WeDF2a2cxYVlOZ2NWOG04d2tQaHNuUXVUZGlRb
-ThFQTNJdE9PDQpSTllhd2Z1VmVTMDIxUlh3UkwyOTBIRklsZndtNmltUm1sS2VwR3ZKQldiclZkcnJMQ3E0czVVUGpjeG
-5RblpFDQp0YXBRUFV0ZlYxbTlWL1Q2OWg1anJmVnkxbk1NNFdXQTZNVlBsamxvbDFrNzJqQXJtK29Ydm9FdkRpTmZqMnF
-qDQpnZnZWMDNSNEdYeFArMEVXRlhhYzR0aUZGdTZZQzRIdTdvdTM4dG5uVy9ueCt4dXJ2bnN4SVc3WkRhTEdLQ2QrDQpW
-Sm1iK3FoVTNOSnZEUEdqRHVrc1hwMGlkZmhiSzZSMmRGejdVRlMxRFlkUml0N2plWnBvdTVENExhSUwwQ1EvDQpLalVyQ
-zdNNlcrWmhpY2MwaWhid2IwM3BwTHY5L3ZiajA2TVk0K0hNaXZLaUsxb3hkK1E9DQotLS0tLUVORCBDRVJUSUZJQ0FURS
-0tLS0t
-
-quota_min_vms=1
-quota_max_vms=3
-</screen>
-
-where in the [elastiq-setup] section 
-
-<itemizedlist>
-
-<listitem><para>
-you <literal>have to modify</literal> with your values:
-<itemizedlist>
-<listitem><para>
-ec2_aws_secret_access_key=<literal>&lt;secret_key&gt;</literal>
-</para></listitem>
-<listitem><para>
-ec2_aws_access_key_id=<literal>&lt;access_key&gt;</literal>
-</para></listitem>
-<listitem><para>
-ec2_image_id=<literal>&lt;ami-id&gt;</literal> the EC2 image id for slave nodes
-</para></listitem>
-<listitem><para>
-ec2_flavour=<literal>&lt;flavor_name&gt;</literal> the flavor for slave nodes
-</para></listitem>
-</itemizedlist>
-</para></listitem>
-
-
-<listitem><para>
-You can also modify the following parameters:
-<itemizedlist>
-<listitem><para>
-"quota_min_vms" the minimum number of slave nodes (never terminated, always available)
-</para></listitem>
-<listitem><para>
-"quota_max_vms" the maximum number of slave nodes that can be istantiated, depending on waiting job in the queue.
-</para></listitem>
-<listitem><para>
-"elastiq_check_queue_every_s" interval time for condor queue check
-</para></listitem>
-<listitem><para>
-"elastiq_idle_for_time_s" time after that inactive VMs will killed
-</para></listitem>
-<listitem><para>
-"elastiq_waiting_jobs_time_s" time after that new VMs will istantiated if there are some jobs in the queue
-</para></listitem>
-<listitem><para>
-"elastiq_n_jobs_per_vm" maximum number of running jobs in a single VM
-</para></listitem>
-<listitem><para>
-"elastiq_estimated_vm_deploy_time_s" foreseen time for VM installation and connection to condor cluster
-</para></listitem>
-<listitem><para>
-"elastiq_check_vms_every_s" interval time for condor VMs check
-</para></listitem>
-</itemizedlist>
-</para></listitem>
-
-<listitem><para>
-The other parameters are internal configuration value for nodes and services:
-<itemizedlist>
-<listitem><para>"ec2_user_data_b64" is a B64 coded string of "user data" about node</para>
 <para>
-here the decoded content:
-<screen>
-[amiconfig]
-plugins=condor vaf-setup
-
-[condor]
-use_ips=true
-highport=42000
-condor_user=condor
-lowport=41000
-condor_secret=12345
-condor_master=%ipv4%
-condor_group=condor
-uid_domain=*
-
-[vaf-setup]
-node_type=slave
-</screen>
-</para></listitem>
-<listitem><para>
-"cacerts_b64" is the B64 coded INFN_CA_2015 certificate, that can be downloaded from the <ulink url="https://security.fi.infn.it/CA/mgt/INFN-CA-2015.pem"> INFN CA web site</ulink>.
-</para></listitem>
-</itemizedlist>
-</para></listitem>
-
-</itemizedlist>
-<note><para>
-You encode and decode in B64 code your file using this site <ulink url="https://www.base64decode.org/">Base64 Decode and Encode</ulink>.
-</para></note>
-After changes, save your user_data_file.txt in a safe place.
+Now you can modify the ecm.conf file changing a small number of parameters.
 </para>
+<screen>
+$ cat ecm.conf
+WNS_FLAVOR=<literal>&lt;flavor_name&gt;</literal>
+MAX_VMS=<literal>&lt;max_vms&gt;</literal>
+MIN_VMS=<literal>&lt;min_vms&gt;</literal>
+JOBS_PER_VM=<literal>&lt;jobs_per_vm&gt;</literal>
+IDLE_TIME=<literal>&lt;idle_time&gt;</literal>
+</screen>
+
+<para>
+Where
+</para>
+<itemizedlist>
+	<listitem><para>
+		<literal>&lt;max_vms&gt;</literal> is the maximum number of slave nodes that can be instantiated, depending on waiting job in the queue.
+	</para></listitem>
+	<listitem><para>
+		<literal>&lt;min_vms&gt;</literal> is the minimum number of slave nodes (never terminated, always available).
+	</para></listitem>
+	<listitem><para>
+		<literal>&lt;jobs_per_vm&gt;</literal> is the maximum number of running jobs in a single VM.
+		<important><para>
+		You have to verify that the number of jobs per VM is compatible with the number of VCPU of the selected flavor.
+		</para></important>
+	</para></listitem>
+	<listitem><para>
+		<literal>&lt;idle_time&gt;</literal> is the time after that inactive VMs will killed.
+        </para></listitem>
+        <listitem><para> 
+		<literal>&lt;flavor_name&gt;</literal> is the name of <literal>flavor</literal> to apply on slaves which can have different profiles.
+		You can use whatever you like, according with the image or snapshot you want to use.
+		Available flavor are listed in the dashboard when you try to launch a VM and in each project are called "cldareapd".medium, small, large, etc.
+		Two useful flavors are the following:
+			<itemizedlist>
+				<listitem><para><literal>flavour=cldareapd.small</literal></para>
+				<para> with 1 VCPU, 2GB RAM and 20GB Root Disk</para></listitem>
+				<listitem><para><literal>flavour=cldareapd.medium</literal></para>
+				<para> with 2 VCPU, 4GB RAM and 25GB Root Disk</para></listitem>
+			</itemizedlist>
+		<note><para>
+		The batch system will use each CPU as a separate slot, then if you have a flavour with, say, 4 cpu, and you submit 1 job, the master will create 1 slave and use 1 of the4 available CPUs.
+		If you submit 4 jobs, again the master will create 1 slave, and use all the 4 CPUs. Large flavour means less machines to be created but possibly a sub-optimal usage of resources.
+		</para></note>
+	</para></listitem>
+</itemizedlist>
 </section>
 
 <section id="LaunchTheCluster">
 <title>Start the elastic cluster</title>
+<para>
+You have only to generate the user_data_file and instantiate the master of cluster.
+It's the master that will start and manage slave nodes using the information provided in the user_data_file.
+</para>
+<para>
+First of all you have to export your EC2 credential
+</para>
+<screen>
+$ source ec2rc.sh
+</screen>
+<para>
+then you launch ecm.py file and follow the instructions
+</para>
+<screen>
+$ python ecm.py
+</screen>
+<para>
+<literal>Chose SO that you want to use for your master and worker nodes</literal>
+</para>
+<screen>
+SO list:
+1: Scientific Linux
+2: Ubuntu
+3: uCernVM
+Which SO do you prefer?
+</screen>
+<important><para>
+You can chose only one of these SO and you have to use it to instantiate both master node and worker node.
+</para></important>
+<para>
+<literal>Select the image that you want to use</literal>
+</para>
+<screen>
+Select the image for your Scientific Linux based master and your Scientific Linux based WNs:
+1: SL67-x86_64-20151017
+2: SL66-x86_64-20150521
+3: SL66-x86_64-20150309
+4: SL66-x86_64-20150131
+5: SL65-x86_64-20151029
+6: Other image. [WARNING] You have to know the EC2-id of image
+</screen>
+<warning><para>
+If you chose "Other image" you have to manually insert the image id in EC2 format, then you have to know it.
+</para></warning>
 
 <para>
-You have only to instantiate the master of cluster. It's the master that will start and manage slave nodes using the information provided in the user_data_file.txt.
+<literal>Generate the user_data_file and launch your cluster</literal>
 </para>
 
-<para>
-Start the master from the dashboard as explained in <xref linkend="CreatingVMs"/>. Go to Instances and here launch a new instance with [Launch Instances]
-</para>
+<important>
+<para>If you use Euca2ools option you have to install euca2ools.2.x in your pc.</para>
+<para>If you use Nova CLI option you have to install python-novaclient in your pc. Moreover you have to download <literal>OpenStack RC file</literal> for your project (via dashboard) and source your credential.</para>
+<screen>
+source &lt;project_name&gt;-openrc.sh
+</screen>
+</important>
+ 
+
+<screen>
+You can use one of these methods:
+1: Dashboard. [INFO] You use the genereted user_data_file as post-creation file.
+2: Euca2ools. [WARNING] You have to have euca2ools.2.x installed in your PC.
+3: Nova CLI. [WARNING] You have to have nova-client installed in your PC.
+How do you prefer?
+</screen>
 
 <para>
-In the details selects:
+More precisely
 </para>
-<para>
-[details]
 <itemizedlist>
-<listitem><para>Availability Zone => nova</para></listitem>
-<listitem><para>Instance Name => whatever you like</para></listitem>
-<listitem><para>Flavour => whatever you like, can be different from the flavour you use for the slaves</para></listitem>
-<listitem><para>Instance Boot Source => Boot From Snapshot</para></listitem>
-<listitem><para>Instance Snapshot => cernvm_230_ldap_pd or another cernvm based image.</para></listitem>
+	<listitem>
+		<para>
+		<literal>Dashboard.</literal> Start the master from the dashboard as explained in <xref linkend="CreatingVMs"/>. Go to Instances and here launch a new instance with [Launch Instances].
+		</para>
+		<para>
+		In the details selects:
+		</para>
+		<para>
+		[details]
+		<itemizedlist>
+			<listitem><para>Availability Zone => nova</para></listitem>
+			<listitem><para>Instance Name => whatever you like</para></listitem>
+			<listitem><para>Flavour => whatever you like, can be different from the flavour you use for the slaves</para></listitem>
+			<listitem><para>Instance Boot Source => Boot From Snapshot</para></listitem>
+			<listitem><para>Instance Snapshot => cernvm_230_ldap_pd or another cernvm based image.</para></listitem>
+		</itemizedlist>
+		</para>
+		<para>
+		[Access and Security]
+		<itemizedlist>
+			<listitem><para>Key pair => The one you created or imported before</para></listitem>
+			<listitem><para>Security Group => the security group for the master (and remove default)</para></listitem>
+		</itemizedlist>
+		</para>
+		<para>
+		[post creation]
+		<itemizedlist>
+			<listitem><para>Customization Script Source => user_data_file</para></listitem>
+		</itemizedlist>
+		</para>
+		<para>
+		Then press launch.
+		</para>
+        </listitem>
+	<listitem>
+	<para>
+	<literal>Euca2ools.</literal> You have to insert some others parameters. The program uses these parameters when it configures and launchs the master node. 
+	</para>
+	<itemizedlist>
+		<listitem><para>The name of the flavor.</para></listitem>
+		<listitem><para>The name of the security group.</para><warning><para>You have to insert the name of security group that you created in <xref linkend="Prerequisites"/></para></warning></listitem>
+                <listitem><para>The name of your key pair.</para><warning><para>If your key pair file name is my_key.pem you have to insert only my_key.</para></warning></listitem>
+	</itemizedlist>
+	<note><para>
+	The name of master node will be similar to server-xxx-yyyy.
+	</para></note>
+	</listitem>
+<listitem>
+        <para>
+        <literal>Nova CLI.</literal> You have to insert some others parameters. The program uses these parameters when it configures and launchs the master node.
+        </para>
+        <itemizedlist>
+		<listitem><para>The name of the VM.</para></listitem>
+                <listitem><para>The name of the image.</para></listitem>
+                <listitem><para>The name of the flavor.</para></listitem>
+                <listitem><para>The name of the security group.</para><warning><para>You have to insert the name of security group that you created in <xref linkend="Prerequisites"/></para></warning></listitem>
+                <listitem><para>The name of your key pair.</para><warning><para>If your key pair file name is my_key.pem you have to insert only my_key.</para></warning></listitem>
+        </itemizedlist>
+        </listitem>
 </itemizedlist>
-</para>
+
 <para>
-[Access and Security]
-<itemizedlist>
-<listitem><para>Key pair => The one you created or imported before</para></listitem>
-<listitem><para>Security Group => the security group for the master (and remove default)</para></listitem>
-</itemizedlist>
-</para>
-<para>
-[post creation]
-<itemizedlist>
-<listitem><para>Customization Script Source => user_data_file.txt</para></listitem>
-</itemizedlist>
-</para>
-<para>
-Then press launch. It will take some minutes, and you will see the master virtual machine listed in the Instances and some slave nodes depending on the "minimum number" defined in the user_data-file.txt.
+Using one of the previous methods to instantiate your master node. It will take some minutes, and you will see the master virtual machine listed in the Instances and some slave nodes depending on the "minimum number" defined in the user_data-file.
 <note><para>
 The name of slave nodes will be similar to server-xxx-yyyy and cannot be overridden.
 </para></note>
@@ -546,27 +496,24 @@ PERMISSION  1c587619a84f417eabc011321fd559ec  default  ALLOWS icmp  -1	-1     FR
 </screen>
 </para>
 <para>
-In order to launch the cluster:
+In order to launch a virtual machine:
 
 <screen>
-$ euca-run-instances -t <literal>&lt;flavor&gt;</literal> -k '<literal>&lt;user_key&gt;</literal>' -f user_data_file.txt -g <literal>&lt;master_security_group&gt;</literal> <literal>&lt;EC2_image_id&gt;</literal>
+$ euca-run-instances -t <literal>&lt;flavor&gt;</literal> -k '<literal>&lt;user_key&gt;</literal>' -f user_data_file.txt -g <literal>&lt;security_group&gt;</literal> <literal>&lt;EC2_image_id&gt;</literal>
 </screen>
 
 where the meaning of the parameters is the following:
 <itemizedlist>
 <listitem><para><literal>&lt;EC2_image_id&gt;</literal> is the EC2 image_id of the image that you want to use</para></listitem>
-<listitem><para><literal>&lt;master_security_group&gt;</literal> is the security group that you have created before</para></listitem>
+<listitem><para><literal>&lt;master_security_group&gt;</literal> is a security group that you have created before</para></listitem>
 <listitem><para><literal>&lt;flavor&gt;</literal> is a suitable flavor</para></listitem>
-<listitem><para><literal>&lt;user_key&gt;</literal> is the keypair that you have generated before</para></listitem>
+<listitem><para><literal>&lt;user_key&gt;</literal> is a keypair that you have generated before</para></listitem>
 </itemizedlist>
 </para>
-<note><para>
-When you want to create an elastic cluster all the parameters will be associated to the master node.
-</para></note>
 <para>
-For example, you can istantiate a master using uCernVM 2.3.0 image, cernvm_master security group and cldareapd.medium flovar as follows:
+For example, you can instantiate a virtual machine using uCernVM 2.3.0 image, default security group and cldareapd.medium flovar as follows:
 <screen>
-$ euca-run-instances -t cldareapd.medium -k 'pub' -f user_data_file.txt -g 'cernvm_master' ami-0000031b
+$ euca-run-instances -t cldareapd.medium -k 'pub' -f user_data_file.txt -g 'default' ami-0000031b
 
 RESERVATION     r-6g9688ny      36b1ddb5dab8404dbe7fc359ec95ecf5
 INSTANCE        i-0007e396      ami-0000031b            server-194e81b2-eee2-442c-829b-b8b7de545a49     pending pub     0               cldareapd.medium        2016-09-01T10:17:27.000Z        nova            
@@ -574,7 +521,7 @@ INSTANCE        i-0007e396      ami-0000031b            server-194e81b2-eee2-442
 </screen>
 </para>
 <note><para>
-The name of master and nodes will be similar to server-xxx-yyyy and cannot be overridden.
+The name of your virtual machine will be similar to server-xxx-yyyy and cannot be overridden.
 </para></note>
 </section>
 </chapter>
