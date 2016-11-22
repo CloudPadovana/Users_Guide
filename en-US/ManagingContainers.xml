@@ -19,7 +19,8 @@ Containers are lightweight and run without the extra load of a hypervisor, so ma
 Docker operates at the OS level, so it can still be run inside a VM!
 </para>
 <para>
-For better acknowledgement about Docker and how to install it, look at <ulink url="https://docs.docker.com/">Docker Documentation</ulink></para>
+  For more information about Docker and how to install it, please
+look at <ulink url="https://docs.docker.com/">Docker Documentation</ulink>.</para>
 
 </section>
 
@@ -27,32 +28,43 @@ For better acknowledgement about Docker and how to install it, look at <ulink ur
 <title>How to Upload Docker Images</title>
 <para>
 To istantiate Docker container the same way you launch VM
-(see <xref linkend="CreatingVMs"/>.), you need a docker image saved in glance.</para>
+(see <xref linkend="CreatingVMs"/>), you need a docker image saved in glance, i.e. the OpenStack imaging
+service.</para>
 <para>
-In order to perform the previous task be sure that the computer you are using has:
+To save a docker image in glance, you need to operate on a computer where:  
 <itemizedlist>
 <listitem><para>
-Openstack CLI installed with the correct setting of the environment variables (see <xref linkend="AccessingtheCloudthroughCLI"/>.)
+Openstack CLI is installed with the correct setting of the environment variables (see <xref linkend="AccessingtheCloudthroughCLI"/>.)
 </para></listitem>
 <listitem><para>
-Docker installed (<ulink url="https://docs.docker.com/engine/getstarted/step_one/">Docker Installation</ulink>)
+Docker is installed (<ulink url="https://docs.docker.com/engine/getstarted/step_one/">Docker Installation</ulink>)
 </para></listitem>
 </itemizedlist>
 </para>
 <para>
-With the following commands you are able to load a docker image in your project.
+Please follow these commands to load a docker image in your project.
 </para>
 <para>
-You can download a docker image from Docker Registry
+First of all download a docker image from Docker Registry:
 <screen>
 docker pull &lt;image-name&gt;
 </screen>
 </para>
 <para>
-Save it and create an image in Glance. (see <xref linkend="ManagingImages"/> for a reference on "how to create and upload images".)
-</para>
+Then save it and create an image in Glance. (see <xref linkend="ManagingImages"/> for a reference on "how to create and upload images"):
 <screen>
-docker save &lt;image-name&gt; | glance image-create --container-format=docker --disk-format=raw --name &lt;image-name&gt;
+  docker save &lt;image-name&gt; | glance image-create --container-format=docker --disk-format=raw --name &lt;image-name&gt;
+</screen>
+</para>
+
+<para>
+For example:  
+
+
+<screen>
+  docker pull centos 
+  docker save centos; | glance image-create --container-format=docker --disk-format=raw --name centos
+ 
 +------------------+--------------------------------------+
 | Property         | Value                                |
 +------------------+--------------------------------------+
@@ -76,11 +88,13 @@ docker save &lt;image-name&gt; | glance image-create --container-format=docker -
 
 
 </screen>
+</para>
 
 <warning><para>
 Be sure that the &lt;image-name&gt; in Docker is the same as in Glance. 
 </para></warning>
-<note><para> If an image is not compatible with some flavor of the instance, could be useful specify the options --min-disk and --min-ram in glance command, to avoid unsuccessfully spawining of the VM with this image. In this way when launching the VM through the dashboard, not compatible flavor are not avalaible. </para>
+<note><para> If an image is not compatible with all flavors, it is recommended to specify the options
+--min-disk and/or --min-ram in the glance command</para>
 <para>
 docker save &lt;image-name&gt; | glance image-create --container-format=docker --disk-format=raw --min-disk DISK_GB --min-ram DISK_RAM --name &lt;image-name&gt;
 </para>
@@ -95,7 +109,8 @@ docker save &lt;image-name&gt; | glance image-create --container-format=docker -
 
 
 <para>
-An istance using docker image has to be scheduled on compute-node with nova-docker. To do so it's necessary to define this property on the image, with the command:
+  An istance using docker image has to be scheduled on a Cloud compute-node running nova-docker.
+  To do so it's necessary to define this property on the image, with the command:
 </para>
 <screen>
 glance image-update --property hypervisor_type=docker &lt;image-id&gt; 
@@ -125,7 +140,7 @@ In this example &lt;image-id&gt; is e7a6b90b-19ed-4560-8945-6ee42e5c3fed.
 
 </screen>
 
-<note> <para>There should be a long lived process running in the docker image, otherwise the instance will not be able to spawn successfully. This can be done by using <ulink url="https://docs.docker.com/reference/builder/">CMD or ENTRYPOINT</ulink> in <ulink url="https://docs.docker.com/engine/getstarted/step_four/">Dockerfile</ulink> or specifing the command through glance image property, 'os_command_line' for test, e.g: 
+<note> <para>There should be a long lived process running in the docker image, otherwise the instance will not be able to spawn successfully. This can be done by using <ulink url="https://docs.docker.com/reference/builder/">CMD or ENTRYPOINT</ulink> in <ulink url="https://docs.docker.com/engine/getstarted/step_four/">Dockerfile</ulink> or specifing the command through the glance image property 'os_command_line', e.g: 
 </para>
 <screen>
 glance image-update --property os_command_line='/usr/sbin/sshd -D' &lt;image-id&gt; 
@@ -153,9 +168,12 @@ glance image-update --property os_command_line='/usr/sbin/sshd -D' &lt;image-id&
 +------------------+--------------------------------------+
 </screen>
 </note> 
-<warning><para>With the 'os_command_line' in this example you need a docker image with openssh service installed which ensures the existance of the /usr/sbin/sshd executable (for a better understanding on how to set up a docker image with SSHd service see this <ulink url="https://docs.docker.com/engine/examples/running_ssh_service/">link</ulink>).</para></warning>
+<warning><para>With respect to this example, you need a docker image with openssh service installed, which
+provides the
+/usr/sbin/sshd executable (for a better understanding on how to set up a docker image with SSHD service see
+<ulink url="https://docs.docker.com/engine/examples/running_ssh_service/">this link</ulink>).</para></warning>
 <para>
-Once the image is correctly loaded and updated you can run the docker image the same way you launch a VM (<xref linkend="CreatingVMs"/>).
+Once the image is correctly loaded and updated you can run the docker image the same way you launch a VM (see <xref linkend="CreatingVMs"/>).
 </para>
 
 </section>

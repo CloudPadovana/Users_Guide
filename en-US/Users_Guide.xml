@@ -10,6 +10,7 @@
 	<xi:include href="Registration.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
 	<xi:include href="GettingStarted.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
 	<xi:include href="AdminVMs.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+	<xi:include href="ManagingContainers.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
 	<xi:include href="ManagingStorage.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
 	<xi:include href="Orchestration.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
 	<xi:include href="ManagingImages.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
