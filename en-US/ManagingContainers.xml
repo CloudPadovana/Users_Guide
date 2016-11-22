@@ -24,6 +24,17 @@ look at <ulink url="https://docs.docker.com/">Docker Documentation</ulink>.</par
 
 </section>
 
+<section id="RunDockCont">
+<title>How to run Docker Container in the Cloud</title>
+
+<para>
+  Docker containers can be run on the Cloud in the very same way used to instantiate virtual machines.
+  But you need first to register a docker image in the OpenStack image service (glance). This is
+  explained in next section.
+</para>
+
+</section>
+
 <section id="UploadDockCont">
 <title>How to Upload Docker Images</title>
 <para>
@@ -37,7 +48,7 @@ To save a docker image in glance, you need to operate on a computer where:
 Openstack CLI is installed with the correct setting of the environment variables (see <xref linkend="AccessingtheCloudthroughCLI"/>.)
 </para></listitem>
 <listitem><para>
-Docker is installed (<ulink url="https://docs.docker.com/engine/getstarted/step_one/">Docker Installation</ulink>)
+Docker is installed (see <ulink url="https://docs.docker.com/engine/getstarted/step_one/">Docker Installation</ulink>)
 </para></listitem>
 </itemizedlist>
 </para>
@@ -51,9 +62,9 @@ docker pull &lt;image-name&gt;
 </screen>
 </para>
 <para>
-Then save it and create an image in Glance. (see <xref linkend="ManagingImages"/> for a reference on "how to create and upload images"):
+Then save it and create an image in Glance (see <xref linkend="ManagingImages"/> for a reference on "how to create and upload images"):
 <screen>
-  docker save &lt;image-name&gt; | glance image-create --container-format=docker --disk-format=raw --name &lt;image-name&gt;
+docker save &lt;image-name&gt; | glance image-create --container-format=docker --disk-format=raw --name &lt;image-name&gt;
 </screen>
 </para>
 
@@ -62,8 +73,9 @@ For example:
 
 
 <screen>
-  docker pull centos 
-  docker save centos; | glance image-create --container-format=docker --disk-format=raw --name centos
+docker pull centos 
+
+docker save centos; | glance image-create --container-format=docker --disk-format=raw --name centos
  
 +------------------+--------------------------------------+
 | Property         | Value                                |
@@ -168,9 +180,9 @@ glance image-update --property os_command_line='/usr/sbin/sshd -D' &lt;image-id&
 +------------------+--------------------------------------+
 </screen>
 </note> 
-<warning><para>With respect to this example, you need a docker image with openssh service installed, which
+<warning><para>With respect to this example, you need a docker image with openssh package installed, which
 provides the
-/usr/sbin/sshd executable (for a better understanding on how to set up a docker image with SSHD service see
+'/usr/sbin/sshd' executable (for a better understanding on how to set up a docker image with SSHD service see
 <ulink url="https://docs.docker.com/engine/examples/running_ssh_service/">this link</ulink>).</para></warning>
 <para>
 Once the image is correctly loaded and updated you can run the docker image the same way you launch a VM (see <xref linkend="CreatingVMs"/>).
