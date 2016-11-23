@@ -7,9 +7,17 @@
 <title>Creating Batch Clusters on the Cloud</title>
 
 <para>
-How to configure and launch an elastic cluster based on microCernVM image with HTCondor as batch system and the elastiq service for the dynamic management of resources.
-The procedure is described in this chapter.                          
+  The virtual machines provided by the Cloud Area Padovana can also be used to
+  implement batch clusters where users can run their jobs.
 </para>
+<para>
+In this chapter we explain how to implement a dynamic batch cluster based
+on <ulink url="http://research.cs.wisc.edu/htcondor/manual/">HTCondor</ulink>.
+</para>
+  
+ 
+
+  
 
 <section id="TheIdea">
 <title>Intro: the idea</title>
