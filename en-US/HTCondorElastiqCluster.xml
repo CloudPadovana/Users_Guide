@@ -24,9 +24,11 @@ on <ulink url="http://research.cs.wisc.edu/htcondor/manual/">HTCondor</ulink>.
 <para>                                                                         
   You create on the cloud a virtual machine that acts as a master for a dynamic
   batch system (implemented using HTCondor).
-  This master node can be instantiated through the dashboard, or using the nova
-  CLI tools, or using the EC2 euca2ools.
-</para>
+  When you create the master, using the instructions reported in
+  <xref linkend="CreatingVMs"/>, you will need to specify some user-data to describe the cluster
+  configuration, as described below.
+</para>  
+
 
 <para>
   The master node will be able to
@@ -36,7 +38,20 @@ on <ulink url="http://research.cs.wisc.edu/htcondor/manual/">HTCondor</ulink>.
 <para>
   You can log in on the master node and submit jobs to the batch system. These jobs will be run on the slave nodes, get done, and eventually the slaves will be released. 
 </para>
+
+<note>
+<para>
+  The master and the slave must use the same image (which should have
+  all the needed software). However the master can use a different flavor with
+  respect to the slave nodes.
+</para>
+</note>
+
 </section>
+
+
+
+
 
 <section id="Prerequisites">
 <title>Prerequisites</title>
