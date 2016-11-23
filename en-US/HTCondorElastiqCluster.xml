@@ -41,7 +41,7 @@ on <ulink url="http://research.cs.wisc.edu/htcondor/manual/">HTCondor</ulink>.
 
 <note>
 <para>
-  The master and the slave must use the same image (which should have
+  The master and the slaves must use the same image (which should have
   all the needed software). However the master can use a different flavor with
   respect to the slave nodes.
 </para>
@@ -57,8 +57,15 @@ on <ulink url="http://research.cs.wisc.edu/htcondor/manual/">HTCondor</ulink>.
 <title>Prerequisites</title>
 <para>
 <itemizedlist>
-<listitem><para>You should be registered in the Cloud as member of a project.</para></listitem>
-<listitem><para>You need to have the EC2 credentials of the project you want to use (see <xref linkend="AccessingtheCloudthroughEC2"/>). You can download them from the dashboard as following:</para>
+  <listitem><para>You should be registered in the Cloud as member of a project.</para></listitem>
+
+<listitem><para>
+  You need to have created a SSH key-pairs, ad explained in
+  <xref linkend="CreatingAKeypair"/>.
+  This will allow to log in the master and in the slave nodes.
+</para></listitem>
+
+<listitem><para>You need to download the EC2 credentials of the project you want to use (see <xref linkend="AccessingtheCloudthroughEC2"/>). You can download them from the dashboard as following:</para>
 <para>Open the dashboard, select the project (drop down menu on top left of the dashboard), go to Access &amp; Security (under the 'Compute' section), go to
 'Api Access' section and here click on [Download EC2 credentials].</para>
 <para>You'll get a zip file with a name like: Project-x509.zip , where Project is the one you have chosen. The zip contains the following files:
@@ -91,7 +98,8 @@ alias ec2-bundle-image="ec2-bundle-image --cert ${EC2_CERT} --privatekey ${EC2_P
 alias ec2-upload-bundle="ec2-upload-bundle -a ${EC2_ACCESS_KEY} -s ${EC2_SECRET_KEY} --url ${S3_URL} --ec2cert ${NOVA_CERT}"
 </screen>
 where EC2_ACCESS_KEY and EC2_SECRET_KEY are different for each project and user. The elastiq service uses these values to instantiate and to kill VMs in the specific project.
-	</para></listitem>
+</para></listitem>
+
 	<listitem><para>
 	  If you want to use nova CLI to instantiate the master node,
 	  you have to download the <literal>&lt;project_name&gt;</literal>-openrc.sh file of the project you want to use.
@@ -99,10 +107,6 @@ where EC2_ACCESS_KEY and EC2_SECRET_KEY are different for each project and user.
 		</para>
 		<para>
 		Open the dashboard, select the project (drop down menu on top left of the dashboard), go to 'Access &amp; Security' (under the 'Compute' section), go to 'Api Access' section and here click on [Download OpenStack RC file].
-	</para></listitem>
-	<listitem><para>
-		In order to log in the master and slave nodes you need to use a SSH key. 
-		To create a SSH key pairs from dashboard see <xref linkend="CreatingAKeypair"/>.
 	</para></listitem>
 
 	<listitem><para>
