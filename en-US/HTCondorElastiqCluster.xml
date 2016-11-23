@@ -22,7 +22,19 @@ on <ulink url="http://research.cs.wisc.edu/htcondor/manual/">HTCondor</ulink>.
 <section id="TheIdea">
 <title>Intro: the idea</title>
 <para>                                                                         
-You create on the cloud a virtual machine that acts as a master for a dynamic batch system. The master node will be able to spawn new slave nodes when jobs are submitted to the batch system. The elastic cluster will provide a number of virtual resources that scales up or down depending on your need. The total number of active virtual nodes is dynamic. You can log in on the master node and submit jobs to the batch system. These jobs will be run on the slave nodes, get done, and eventually the slaves will be released. The batch system is HTCondor.
+  You create on the cloud a virtual machine that acts as a master for a dynamic
+  batch system (implemented using HTCondor).
+  This master node can be instantiated through the dashboard, or using the nova
+  CLI tools, or using the EC2 euca2ools.
+</para>
+
+<para>
+  The master node will be able to
+  spawn (using the EC2 euca2ools) new slave nodes (where jobs are executed) when jobs are submitted to the batch system. The elastic cluster will provide a number of virtual resources that scales up or down depending on your need. The total number of active virtual nodes is dynamic.
+</para>
+
+<para>
+  You can log in on the master node and submit jobs to the batch system. These jobs will be run on the slave nodes, get done, and eventually the slaves will be released. 
 </para>
 </section>
 
@@ -32,8 +44,9 @@ You create on the cloud a virtual machine that acts as a master for a dynamic ba
 <itemizedlist>
 <listitem><para>You should be registered in the Cloud as member of a project.</para></listitem>
 <listitem><para>You need to have the EC2 credentials of the project you want to use (see <xref linkend="AccessingtheCloudthroughEC2"/>). You can download them from the dashboard as following:</para>
-<para>open the dashboard, select the experiment (drop down menu on top left of the dashboard), go to Access &amp; Security (under Compute section), go in Api Access section and here click on [Download EC2 credentials].</para>
-<para>You'll get a zip file with a name like: Project-x509.zip , where Project is the one you chosen. The zip contains the following files:
+<para>Open the dashboard, select the project (drop down menu on top left of the dashboard), go to Access &amp; Security (under the 'Compute' section), go to
+'Api Access' section and here click on [Download EC2 credentials].</para>
+<para>You'll get a zip file with a name like: Project-x509.zip , where Project is the one you have chosen. The zip contains the following files:
 <screen>
 $ unzip Project-x509.zip
 Archive:  Project-x509.zip
@@ -65,15 +78,16 @@ alias ec2-upload-bundle="ec2-upload-bundle -a ${EC2_ACCESS_KEY} -s ${EC2_SECRET_
 where EC2_ACCESS_KEY and EC2_SECRET_KEY are different for each project and user. The elastiq service uses these values to instantiate and to kill VMs in the specific project.
 	</para></listitem>
 	<listitem><para>
-		If you want to use nova cli to instantiate your master you have to download the <literal>&lt;project_name&gt;</literal>-openrc.sh file of the project you want to use.
+	  If you want to use nova CLI to instantiate the master node,
+	  you have to download the <literal>&lt;project_name&gt;</literal>-openrc.sh file of the project you want to use.
 		You can download them from the dashboard as following:
 		</para>
 		<para>
-		open the dashboard, select the experiment (drop down menu on top left of the dashboard), go to Access &amp; Security (under Compute section), go in Api Access section and here click on [Download OpenStack RC file].
+		Open the dashboard, select the project (drop down menu on top left of the dashboard), go to 'Access &amp; Security' (under the 'Compute' section), go to 'Api Access' section and here click on [Download OpenStack RC file].
 	</para></listitem>
 	<listitem><para>
-		In order to access in the master and slave nodes as root you need to have a key. 
-		To create a key pairs from dashboard see <xref linkend="CreatingAKeypair"/>.
+		In order to log in the master and slave nodes you need to use a SSH key. 
+		To create a SSH key pairs from dashboard see <xref linkend="CreatingAKeypair"/>.
 	</para></listitem>
 
 	<listitem><para>
