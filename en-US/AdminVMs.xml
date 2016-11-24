@@ -277,6 +277,13 @@ $ ssh -i ~/private/my_key root@10.64.15.3
 </screen>
 
 <para>
+  The username to be used depends on the used image. It can be 'root' or it can be
+  a sudo-enabled user (e.g. for the centos Cloud images available on the
+  internet, the 'centos' user must be used).
+</para>
+
+
+<para>
 <warning><para>
 Please note that VMs of the Cloud are not registered in the DNS, and therefore 
 you must use the IP address.
