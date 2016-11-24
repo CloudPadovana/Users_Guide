@@ -100,19 +100,20 @@ alias ec2-upload-bundle="ec2-upload-bundle -a ${EC2_ACCESS_KEY} -s ${EC2_SECRET_
 where EC2_ACCESS_KEY and EC2_SECRET_KEY are different for each project and user. The elastiq service uses these values to instantiate and to kill VMs in the specific project.
 </para></listitem>
 
-	<listitem><para>
-	  If you want to use nova CLI to instantiate the master node,
-	  you have to download the <literal>&lt;project_name&gt;</literal>-openrc.sh file of the project you want to use.
-		You can download them from the dashboard as following:
-		</para>
-		<para>
-		Open the dashboard, select the project (drop down menu on top left of the dashboard), go to 'Access &amp; Security' (under the 'Compute' section), go to 'Api Access' section and here click on [Download OpenStack RC file].
-	</para></listitem>
+<listitem><para>
+  You need to identify the image to be used for the master and for the
+  slaves. Currently supported operating systems are RHEL6.x and derivates
+  (SL6.x, CentOS6.x, etc.) and Ubuntu. uCernVM based images are also
+  supported.
+  For such image you also need to find the relevant EC2 id (see <xref linkend="EucaCommands"/>).
+</para></listitem>
 
-	<listitem><para>
-		You need an appropriate security group for the master node containing the following rules:
-		</para>
-		<screen>
+
+<listitem><para>
+  You need to set a specific security group to be used for the master node.
+  This security group must include the following rules:
+</para>
+<screen>
 Direction    Ether Type    IP Protocol    Port Range         Remote IP Prefix
 Egress       IPv4          Any            Any                0.0.0.0/0	
 Egress       IPv6          Any            Any                ::/0	
@@ -120,61 +121,63 @@ Ingress      IPv4          ICMP           Any                0.0.0.0/0
 Ingress      IPv4          TCP            22 (SSH)           0.0.0.0/0	
 Ingress      IPv4          TCP            9618               0.0.0.0/0	
 Ingress      IPv4          TCP            41000 - 42000      0.0.0.0/0
-		</screen>
-		<note><para>
-		Instead of managing the rules of an existing security group, we suggest to create a new security group named e.g. "master_security_group" as explained in <xref linkend="SecurityGroups"/>.
-		</para></note>
-		<para>
-		The slave nodes will instead use the <literal>default</literal> security group of your project. This group must include the following rule: 
-		<screen>
+</screen>
+<note><para>
+  Instead of modifying the rules of an existing security group, we suggest to
+  create a new security group named e.g. "master_security_group".
+  Security groups are discussed in 
+  <xref linkend="SecurityGroups"/>.
+</para></note>
+
+<para>
+  The slave nodes will instead use the <literal>default</literal> security
+  group of your project. This group must include the following rule: 
+<screen>
 Direction  Ether Type  IP Protocol  Port Range   Remote IP Prefix   Remote Security Group
 Ingress    IPv4        Any          Any          -                 <literal>&lt;master_security_group&gt;</literal> 
-		</screen>
-		</para>
-		<para>Where <literal>&lt;master_security_group&gt;</literal> is the name of the security group that you chose for the master node.</para> 
+</screen>
+</para>
+<para>where <literal>&lt;master_security_group&gt;</literal> is the name of the security group that was chosen for the master node.</para> 
 	</listitem>
 
-	<listitem><para>
-	You need to download <ulink url="https://github.com/CloudPadovana/ECM.git">ECM</ulink> software and use it to configure your user_data_file.
-		<screen>
+<listitem><para>
+  You need to download <ulink url="https://github.com/CloudPadovana/ECM.git">ECM</ulink> software.  As explained in <xref linkend="ClusterConfiguration"/>,
+  this will be used to create the batch cluster configuration:
+<screen>
 $ git clone https://github.com/CloudPadovana/ECM.git
-		</screen>
-This is explained in more detail in <xref linkend="ClusterConfiguration"/>.
+</screen>
 	</para></listitem>
+	
+<listitem><para>
+  Optionally (only if you want to instantiate the master node
+  using the EC2 euca2ools) you need to have the euca2ools installed: see <xref linkend="EucaCommands"/>.   
+</para>
+</listitem>
 
-	<listitem><para>
-		In order to instantiate the cluster you have to use a uCernVM, SL6.x or Ubuntu based image for master node and slave nodes. The uCernVM are SL6.x based images with CVMFS.
-		<note><para>
-		If you want to use some specific software in your master and slave nodes that is not included in the default image, you can create a new image by:
-		<itemizedlist>
-			<listitem><para> creating a VM using a uCernVM image</para></listitem>
-			<listitem><para> customizing it (e.g. installing the missing packages)</para></listitem>
-			<listitem><para> doing a snapshot, and therefore creating the required image.</para></listitem>
-		</itemizedlist>
-		This is explained in more detail in <xref linkend="SnapshottingVMs"/>. In this way you will have in your VMs all the software that you need.
-		</para></note>
-	</para></listitem>
+	
+<listitem><para>
+  Optionally (only if you want to instantiate the master node
+  using the OpenStack Nova CLI) you need to have the OpenStack nova CLI
+  installed and you must
+  have downloaded the <literal>&lt;project_name&gt;</literal>-openrc.sh file
+  of the project you want to use.
+  This is discussed in <xref linkend="AccessingtheCloudthroughCLI"/>. 
+</para></listitem>
+
+
 </itemizedlist>
 
 </para>
+
+	
 </section>
 
 <section id="ClusterConfiguration">
 <title>The cluster configuration</title>
 
 <para>
-You can use ecm.py into ECM directory to configure and instantiate your elastiq cluster.
-You can choose from some public images without knowning their id in EC2 format, but if you want to use a snapshot or a different image your have to know its id.
-</para>
-<important><para>
-No way to get the EC2 image_ID from dashboard, it can be known only using euca2ools installed on some machine (see <xref linkend="EucaCommands"/>).
-</para></important>
-<warning><para>
-The version of euca2ool that works with our production cloud is an old version 2.x.
-See <xref linkend="EucaCommands"/> to find instruction about how to install euca2ools and how to use euca commands.
-</para></warning>
-<para>
-Now you can modify the ecm.conf file changing a small number of parameters.
+  Properly configure the ecm.conf file stored in the ECM directory (created
+  when you downloaded via git the ECM software)
 </para>
 <screen>
 $ cat ecm.conf
@@ -186,57 +189,72 @@ IDLE_TIME=<literal>&lt;idle_time&gt;</literal>
 </screen>
 
 <para>
-Where
+Where:
 </para>
 <itemizedlist>
-	<listitem><para>
-		<literal>&lt;max_vms&gt;</literal> is the maximum number of slave nodes that can be instantiated, depending on waiting job in the queue.
+        <listitem><para> 
+	  <literal>&lt;WNS_FLAVOR&gt;</literal> is the name of the
+	  flavor to be used for the slave nodes.
+	  Flavors have been discussed in <xref linkend="Flavors"/>. 
+	  Available flavors are listed in the dashboard when you try to
+	  launch a VM 
+	  Two useful flavors are the following:
+			<itemizedlist>
+				<listitem><para><literal>cldareapd.small</literal></para>
+				<para>1 VCPU, 2GB RAM</para></listitem>
+				
+				<listitem><para><literal>cldareapd.medium</literal></para>
+				<para>2 VCPU, 4GB RAM</para></listitem>
+                      </itemizedlist>
 	</para></listitem>
+	
 	<listitem><para>
-		<literal>&lt;min_vms&gt;</literal> is the minimum number of slave nodes (never terminated, always available).
+	  <literal>&lt;MAX_VMS&gt;</literal> is the maximum number of
+	  slave nodes that can be instantiated.
 	</para></listitem>
+	
 	<listitem><para>
-		<literal>&lt;jobs_per_vm&gt;</literal> is the maximum number of running jobs in a single VM.
+		<literal>&lt;MIN_VMS&gt;</literal> is the minimum number of slave nodes (never terminated, always available).
+	</para></listitem>
+	
+	<listitem><para>
+	  <literal>&lt;JOBS_PER_VM&gt;</literal> is the maximum number of
+	  jobs that will be run in a single slave node.
 		<important><para>
 		You have to verify that the number of jobs per VM is compatible with the number of VCPU of the selected flavor.
 		</para></important>
 	</para></listitem>
+	
 	<listitem><para>
-		<literal>&lt;idle_time&gt;</literal> is the time after that inactive VMs will killed.
+	  <literal>&lt;IDLE_TIME&gt;</literal> is the time (in seconds)
+	  after which inactive VMs will be killed.
         </para></listitem>
-        <listitem><para> 
-		<literal>&lt;flavor_name&gt;</literal> is the name of <literal>flavor</literal> to apply on slaves which can have different profiles.
-		You can use whatever you like, according with the image or snapshot you want to use.
-		Available flavor are listed in the dashboard when you try to launch a VM and in each project are called "cldareapd".medium, small, large, etc.
-		Two useful flavors are the following:
-			<itemizedlist>
-				<listitem><para><literal>flavour=cldareapd.small</literal></para>
-				<para> with 1 VCPU, 2GB RAM and 20GB Root Disk</para></listitem>
-				<listitem><para><literal>flavour=cldareapd.medium</literal></para>
-				<para> with 2 VCPU, 4GB RAM and 25GB Root Disk</para></listitem>
-			</itemizedlist>
-		<note><para>
-		The batch system will use each CPU as a separate slot, then if you have a flavour with, say, 4 cpu, and you submit 1 job, the master will create 1 slave and use 1 of the4 available CPUs.
-		If you submit 4 jobs, again the master will create 1 slave, and use all the 4 CPUs. Large flavour means less machines to be created but possibly a sub-optimal usage of resources.
+       </itemizedlist>
+
+	<note><para>
+		The batch system will use each CPU as a separate job slot. So if you have a flavor with 4 cpu, and you submit 1 job, the master will create 1 slave and use 1 of the 4 available CPUs.
+		If you submit 4 jobs, again the master will create 1 slave, and will use all the 4 CPUs. Large flavors means less
+		machines to be created but possibly a sub-optimal usage of resources.
 		</para></note>
-	</para></listitem>
-</itemizedlist>
 </section>
 
 <section id="LaunchTheCluster">
 <title>Start the elastic cluster</title>
 <para>
-You have only to generate the user_data_file and instantiate the master of cluster.
-It's the master that will start and manage slave nodes using the information provided in the user_data_file.
+  To start the elastic cluster, you must only instantiate the master node. When you create such master,
+  you will need to specify some user-data to describe the cluster configuration.
+  The ecm.py script allows to create such user-data file, using as input the ecm.conf file previously filled
+  (see <xref linkend="ClusterConfiguration"/>).
 </para>
+
 <para>
-First of all you have to export your EC2 credential
+First of all you have to set the relevant EC2 credentials:
 </para>
 <screen>
 $ source ec2rc.sh
 </screen>
 <para>
-then you launch ecm.py file and follow the instructions
+Then you must launch ecm.py file and follow the instructions
 </para>
 <screen>
 $ python ecm.py
@@ -305,24 +323,22 @@ More precisely
 		<para>
 		[details]
 		<itemizedlist>
-			<listitem><para>Availability Zone => nova</para></listitem>
 			<listitem><para>Instance Name => whatever you like</para></listitem>
-			<listitem><para>Flavour => whatever you like, can be different from the flavour you use for the slaves</para></listitem>
-			<listitem><para>Instance Boot Source => Boot From Snapshot</para></listitem>
-			<listitem><para>Instance Snapshot => cernvm_230_ldap_pd or another cernvm based image.</para></listitem>
+			<listitem><para>Flavor => whatever you like; can be different from the flavor chosen for the slave nodes</para></listitem>
+			<listitem><para>Image name => The same image chosen for the slaves.</para></listitem>
 		</itemizedlist>
 		</para>
 		<para>
 		[Access and Security]
 		<itemizedlist>
-			<listitem><para>Key pair => The one you created or imported before</para></listitem>
-			<listitem><para>Security Group => the security group for the master (and remove default)</para></listitem>
+			<listitem><para>Key pair => The key-pair that will be used to log on the nodes of the batch cluster</para></listitem>
+			<listitem><para>Security Group => the security group for the master (choose only this one)</para></listitem>
 		</itemizedlist>
 		</para>
 		<para>
 		[post creation]
 		<itemizedlist>
-			<listitem><para>Customization Script Source => user_data_file</para></listitem>
+			<listitem><para>Customization Script Source => the user_data_file created by the ecm.py script </para></listitem>
 		</itemizedlist>
 		</para>
 		<para>
@@ -357,14 +373,43 @@ More precisely
 </itemizedlist>
 
 <para>
-Using one of the previous methods to instantiate your master node. It will take some minutes, and you will see the master virtual machine listed in the Instances and some slave nodes depending on the "minimum number" defined in the user_data-file.
-<note><para>
-The name of slave nodes will be similar to server-xxx-yyyy and cannot be overridden.
-</para></note>
-Get the IP address of master, and log in as root using the key you have imported/created before i.e:
+  Once you requested the creation of the master node, after some minutes, you will see that the master virtual machine and some slave nodes
+( depending on the "MIN_VMS" attribute you defined in the ecm.conf) created.
+
+  Get the IP address of master, and log in on this machine using the key you have imported/created before i.e:
 <screen>
 $ ssh -i ~/.ssh/id_rsa root@10.64.YY.XXX
 </screen>
+</para>
+
+<para>
+  For security reasons, as root you can not submit jobs to the HTCondor cluster. So make sure that a 'normal' account exists in the master
+  node. In case you can create using the command:
+
+  <screen>
+# adduser <literal>&lt;username&gt;</literal>
+</screen>
+Create a password for this account:
+<screen>
+# passwd <literal>&lt;username&gt;</literal>
+</screen>
+
+
+You might also consider to rely on the User LDAP, as explained in <xref linkend="EnablingINFNPadovaLDAP"/>.
+</para>
+
+<para>
+  You have to import any external disk, create homes, etc, as you would do in a normal machine.
+</para>
+</section>
+
+<section id="UseTheCluster">
+<title>Use the elastic cluster</title>
+
+
+<para>
+  Log to the master node using your unpriviledged account.
+
 Check if condor is running with the command:
 <screen>
 # condor_q
@@ -374,7 +419,7 @@ Check if condor is running with the command:
 0 jobs; 0 completed, 0 removed, 0 idle, 0 running, 0 held, 0 suspended
 </screen>
 
-and the slots in the cluster with the command:
+Check the status of the cluster:
 
 <screen>
 # condor_status
@@ -388,30 +433,13 @@ slot2@10-64-22-84. LINUX      X86_64 Unclaimed Idle      0.000 1977  2+12:45:25
 
                Total     2     0       0         2       0          0        0
 </screen>
-
-
-<warning><para>
-For security reason, as root you can not submit jobs with condor. So you have to create in the master a normal user. You have to import any external disk, create homes, etc, as you would do in a normal machine.
-</para></warning>
-To create an user:
-<screen>
-# adduser <literal>&lt;username&gt;</literal>
-</screen>
-and associate a password:
-<screen>
-# passwd <literal>&lt;username&gt;</literal>
-</screen>
-
-Users in ldap can submit condor jobs.
-You can enable users in ldap as explained in <xref linkend="EnablingINFNPadovaLDAP"/>.
 </para>
-</section>
 
 
-<section id="UseTheCluster">
-<title>Use the elastic cluster</title>
 <para>
-A simple example of condor classad is the following:
+  Create you HTCondor classad.
+  
+A simple example is the following:
 </para>
 <screen>
 $ cat test.classad
@@ -429,13 +457,13 @@ where <literal>test.sh</literal> is the executable you want to run.
 
 </para>
 <para>
-Submit your jobs with a simple
+Submit your jobs issuing the command:
 <screen>
 $ condor_submit test.classad
 </screen>
-and check their status with 
+and check their status with: 
 <screen>
-$ condor_status
+$ condor_q
 </screen>
 
 You can find documentation about HTCondor <ulink url="http://research.cs.wisc.edu/htcondor/manual/">here</ulink>.
@@ -444,7 +472,7 @@ You can find documentation about HTCondor <ulink url="http://research.cs.wisc.ed
 
 
 <section id="EucaCommands">
-<title>Euca2ools</title>
+<title>Euca Commands</title>
 <para>
 </para>
 <para><literal>Install Euca2ools</literal></para>
