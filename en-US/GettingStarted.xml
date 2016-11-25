@@ -303,16 +303,32 @@ different per project that you work on. If you log into the dashboard, you
 will find an <menuchoice><guimenu>Access &amp; Security</guimenu></menuchoice>
 menu on the left hand side. Then choose the 
 <menuchoice><guimenu>API Access</guimenu></menuchoice> Tab to select the 
-options related to using the program interfaces. Select the 
-<menuchoice><guimenu>Download OpenStack RC file</guimenu></menuchoice> option 
-on the top right to download the rc file for your current project. 
+options related to using the program interfaces. Select among
+<menuchoice><guimenu>Download OpenStack RC file v2.0</guimenu></menuchoice>
+and <menuchoice><guimenu>Download OpenStack RC file v3</guimenu></menuchoice>,
+to download the rc file for your current project (v2.0 or v3).
 </para>
 
+<para>
+  The v3 openrc file requires a quite recent version of the
+  Openstack client .
+</para>
+
+
+
 <mediaobject>
-<imageobject>
-  <imagedata fileref="./images/download_rc.png" />
-</imageobject>
+  <imageobject>
+    <imagedata condition="web" fileref="./images/download_rc.png" />
+    <imagedata condition="pdf" fileref="./images/download_rc.png" width="450" />
+  </imageobject>
 </mediaobject>
+
+
+<warning><para>
+  Because of a bug, if you downloaded the v2.0 rc file, you have to edit it
+  and replace "v3" with "v2.0" in the OS_AUTH_URL variable setting
+</para></warning>
+
 
 <para>
 This file 
@@ -353,17 +369,18 @@ The OpenStack command line tools (nova for compute resources,
 glance for images) can then be used, etc:
 </para>
 <screen>
-$ . ALICE-openrc.sh 
-Please enter your OpenStack Password: 
-$ nova list
-+--------------------------------------+---------------------------------------------+--------+------------+-------------+----------------------+
-| ID                                   | Name                                        | Status | Task State | Power State | Networks             |
-+--------------------------------------+---------------------------------------------+--------+------------+-------------+----------------------+
-| d85a4221-b2cc-4bcd-8c56-af21afa8ce5c | Monitoring_Server                           | ACTIVE | -          | Running     | alice-lan=10.62.13.5 |
-| 60005bae-93df-454e-9e1f-07c3be27157c | MySQL_Server                                | ACTIVE | -          | Running     | alice-lan=10.62.13.6 |
-| 6cbb5ded-ba65-4850-8078-1e9f1836e7de | Server 6cbb5ded-ba65-4850-8078-1e9f1836e7de | ACTIVE | -          | Running     | alice-lan=10.62.13.2 |
-| 5ce6926a-2796-4dbd-82f2-d84ced6acf38 | Xrootd_Server                               | ACTIVE | -          | Running     | alice-lan=10.62.13.4 |
-+--------------------------------------+---------------------------------------------+--------+------------+-------------+----------------------+
+  $ . Muon\ Tomography-openrc.sh
+  Please enter your OpenStack Password:
+  
+  $ nova list
+  +--------------------------------------+----------+--------+------------+-------------+----------------------------------+
+  | ID                                   | Name     | Status | Task State | Power State | Networks                         |
+  +--------------------------------------+----------+--------+------------+-------------+----------------------------------+
+  | 178c541d-ee63-4678-9f22-99d799cd715e | dock01   | ACTIVE | -          | Running     | Muon-Tomography-lan=10.64.18.105 |
+  | 2bcf0cd1-5289-43ef-8d2e-bd18385f1df9 | mutom1   | ACTIVE | -          | Running     | Muon-Tomography-lan=10.64.18.118 |
+  | 0e237a8f-82e6-48b8-8b5c-44ad9a39a8de | pin8     | ACTIVE | -          | Running     | Muon-Tomography-lan=10.64.18.90  |
+  | 1f862ffa-d469-40aa-87a8-ef0d0a842919 | provaNFS | ACTIVE | -          | Running     | Muon-Tomography-lan=10.64.18.120 |
+  +--------------------------------------+----------+--------+------------+-------------+----------------------------------+
 </screen>
 
 <note><para>
