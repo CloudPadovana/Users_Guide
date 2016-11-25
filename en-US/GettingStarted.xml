@@ -291,9 +291,9 @@ contains extended information on the command line tools in OpenStack.
 Documentation at <ulink url="http://docs.openstack.org/user-guide/content/install_clients.html">http://docs.openstack.org/user-guide/content/install_clients.html</ulink> explains how to install the Openstack client.
 </para>
 
-<para>
+<!--para>
 The OpenStack client is also installed on <literal>lx.pd.infn.it</literal>.
-</para>
+</para-->
 
 <para>
 The OpenStack tools require a set of shell environment variables in order to 
