@@ -121,8 +121,10 @@ box).
 </para>
 
 <para>
-Select <literal>Create new project</literal> if instead you want to ask
-the creation of a new project. In this case you will have to specify also
+Select <literal>Create new project</literal> if instead you want to ask for
+the creation of a new project (and you are the leader of the experiment/
+research group associated to this project).
+In this case you will have to specify also
 a Project name and a Project Description. You will also have to specify
 if this project must be private (a personal project where you will
 be the only member) or not.
@@ -170,8 +172,7 @@ window will appear.
 
 <para>
 Read the AUP that you need to accept (by clicking the 
-<menuchoice><guimenu>Accept</guimenu></menuchoice> button) to be allowed
-to have an account.
+<menuchoice><guimenu>Accept</guimenu></menuchoice> button).
 </para>
 
 <para>
@@ -230,8 +231,8 @@ A form such as the one of the following image will appear.
 <para>
 Fill the form with your personal data (First Name, Last Name, Email Address,
 Organization (e.g. 'INFN Padova'), Phone number.
-Choose a User name (please note that it could be changed by the Cloud
-admins during the registration process) and a Password.
+Choose a User name (usually your family name: please note that it could be changed
+by the Cloud admins during the registration process) and a Password.
 Specify the name of a contact person in Padova/Legnaro
 (e.g. your team leader), and if needed provide some other info in the
 'Notes' field. 
@@ -299,8 +300,7 @@ window will appear.
 
 <para>
 Read the AUP that you need to accept (by clicking the 
-<menuchoice><guimenu>Accept</guimenu></menuchoice> button) to be allowed
-to have an account.
+<menuchoice><guimenu>Accept</guimenu></menuchoice> button).
 </para>
 
 <para>
