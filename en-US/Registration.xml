@@ -339,10 +339,30 @@ an already existing project.
 </para>
 
 <para>
-This can be done using the OpenStack dashboard clicking on 
-<menuchoice><guimenu>Request for projects</guimenu></menuchoice> (on the 
-bottom-left).
+  This can be done using the OpenStack dashboard clicking on 
+  <menuchoice><guimenu>Identity</guimenu></menuchoice>
+  and then <menuchoice><guimenu>Projects</guimenu></menuchoice> (on the 
+left).
 
+You should see something like:
+
+
+
+
+
+<mediaobject>
+  <imageobject>
+    <imagedata condition="web" fileref="./images/Identity_Projects.png" />
+    <imagedata condition="pdf" fileref="./images/Identity_Projects.png" width="450" />
+  </imageobject>
+</mediaobject>
+
+</para>
+
+<para>
+Then click on <menuchoice><guimenu>Subscribe to project</guimenu></menuchoice> on the top right.
+
+  
 A window such as this one will appear:
 
 <mediaobject>
