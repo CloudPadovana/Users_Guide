@@ -419,11 +419,16 @@ on the top right to download the zip file for your current project.
 This zip file will be downloaded to the browser. 
 </para>
 
+
+
+
 <mediaobject>
 <imageobject>
-  <imagedata fileref="./images/download_rc.png" />
+  <imagedata condition="web" fileref="./images/download_rc.png" />
+  <imagedata condition="pdf" fileref="./images/download_rc.png" width="450" />
 </imageobject>
 </mediaobject>
+
 
 <para>
 This file should be saved onto the machine where 
@@ -465,6 +470,14 @@ RESERVATIONr-sll3yfjlae4b3654ea08441fabe232390ae908b6
 INSTANCEi-000015b2ami-0000001emonitoring-serverrunningvenaruzzo-cloudpp0m1.small2014-09-01T09:34:31.000Znova10.62.13.5instance-store
 </screen>
 
+<warning><para>
+  For some euca2ools distributions sourcing the ec2rc.sh script is not enough. You need to explictly
+  specify the access and secret keys and the endpoint, e.g.:
+  <screen>
+    euca-describe-instances -I ${EC2_ACCESS_KEY} -S ${EC2_SECRET_KEY} -U ${EC2_URL}
+  </screen>  
+</para></warning>
+  
 </section>
 
 
