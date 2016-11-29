@@ -404,6 +404,25 @@ standard for computational clouds.
 The <literal>euca2ools</literal> are command line tools that can be used to 
 interact with an 
 EC2 based cloud.
+</para>
+
+<para>You can install the <literal>euca2ools</literal> package as
+follows:</para>
+<para>CentOS
+<screen>
+  # yum install euca2ools
+</screen>
+</para>
+<para>Ubuntu
+<screen>
+  # apt-get install euca2ools
+</screen>
+</para>
+
+
+
+
+<para>
 The euca2ools require a set of shell environment variables in order to run. 
 These environment 
 variables are different per project that you work on.
@@ -451,8 +470,8 @@ use a C shell based shell, you would need to adapt this using setenv.
 </para>
 
 <para>
-To test 
-it, you can e.g. try the following:
+  To test  it, you can e.g. try the following command that lists the
+  existing instances for your project:
 </para>
 
 <screen>
@@ -471,8 +490,10 @@ INSTANCEi-000015b2ami-0000001emonitoring-serverrunningvenaruzzo-cloudpp0m1.small
 </screen>
 
 <warning><para>
-  For some euca2ools distributions sourcing the ec2rc.sh script is not enough. You need to explictly
-  specify the access and secret keys and the endpoint, e.g.:
+  For some euca2ools distributions sourcing the ec2rc.sh script is not enough.
+  You need to explictly
+  specify the access and secret keys, and the endpoint, with the
+  relevant command line options, e.g.:
   <screen>
     euca-describe-instances -I ${EC2_ACCESS_KEY} -S ${EC2_SECRET_KEY} -U ${EC2_URL}
   </screen>  

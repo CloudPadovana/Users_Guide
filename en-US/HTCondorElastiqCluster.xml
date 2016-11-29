@@ -105,7 +105,8 @@ where EC2_ACCESS_KEY and EC2_SECRET_KEY are different for each project and user.
   slaves. Currently supported operating systems are RHEL6.x and derivates
   (SL6.x, CentOS6.x, etc.) and Ubuntu. uCernVM based images are also
   supported.
-  For such image you also need to find the relevant EC2 id (see <xref linkend="EucaCommands"/>).
+  For such image you also need to lnow the relevant EC2 (AMI) id
+  (see <xref linkend="HowToFindAMIID"/>).
 </para></listitem>
 
 
@@ -148,21 +149,7 @@ $ git clone https://github.com/CloudPadovana/ECM.git
 </screen>
 	</para></listitem>
 	
-<listitem><para>
-  Optionally (only if you want to instantiate the master node
-  using the EC2 euca2ools) you need to have the euca2ools installed: see <xref linkend="EucaCommands"/>.   
-</para>
-</listitem>
 
-	
-<listitem><para>
-  Optionally (only if you want to instantiate the master node
-  using the OpenStack Nova CLI) you need to have the OpenStack nova CLI
-  installed and you must
-  have downloaded the <literal>&lt;project_name&gt;</literal>-openrc.sh file
-  of the project you want to use.
-  This is discussed in <xref linkend="AccessingtheCloudthroughCLI"/>. 
-</para></listitem>
 
 
 </itemizedlist>
@@ -471,43 +458,29 @@ You can find documentation about HTCondor <ulink url="http://research.cs.wisc.ed
 </section>
 
 
-<section id="EucaCommands">
-<title>Euca Commands</title>
+<section id="HowToFindAMIID">
+<title>How to find the EC2 (AMI) id of an image</title>
 <para>
+  As explained above, to use the Elastic batch cluster you need to
+  know the EC2 (AMI) id of the image you want to use.
 </para>
-<para><literal>Install Euca2ools</literal></para>
-<para>You can install <literal>euca2ools</literal> package as follows:</para>
-<para>CentOS
-<screen>
-# yum install euca2ools
-</screen>
-</para>
-<para>Ubuntu
-<screen>
-# apt-get install euca2ools
-</screen>
-</para>
-<warning><para>
-You need a 2.x version of euca2ools package because the last version doesn't work with our production cloud. You can check the version available in your system as follows:
-<screen>
-$ yum list | grep euca2ools
-</screen>
-If the version available is not the 2.x, you can not install euca2ools using the command <literal>yum install euca2ools</literal>.
-</para></warning>
 <para>
-You can also install euca2ools using the tgz archive available on cld-ctrl-01.cloud.pd.infn.it under the directory /root/EUCA2OOLS_FOR_PRODUCTION/ that containing an old version of eucatools. Use it for the production up the next openstack update.
+  First of all you need to install the euca2ools and to download the EC2
+  credentials for your project, as explained in
+  <xref linkend="AccessingtheCloudthroughEC2"/>.
 </para>
-<para><literal>Use it</literal></para>
+
 <para>
-After the installation of client, you need to have the ec2rc.sh file with your project credential (you can download it as explained in <xref linkend="AccessingtheCloudthroughEC2"/>).</para>
-<para>
-Source it to have the correct environment
+  Uncompress (unzip) the EC2 zip file, and source the ec2rc.sh script to set
+  the correct environment:
+  
 <screen>
 $ source ec2rc.sh
 </screen>
 </para>
 <para>
-To discover the EC2 id of your image or snapshot:
+  To discover the EC2 id of your image or snapshot, use the
+  'euca-describe-images' command:
 
 <screen>
 $ euca-describe-images
@@ -515,20 +488,47 @@ $ euca-describe-images
 IMAGE   ami-0000031b    None (uCernVM 2.3-0)    beaeede3841b47efb6b665a1a667e5b1        available       public                  machine                         instance-store
 IMAGE   ami-00000447    snapshot        36b1ddb5dab8404dbe7fc359ec95ecf5        available       public                  machine                         instance-store
 </screen>
-
-in this case:
 </para>
-<itemizedlist>
-<listitem><para>the EC2 image_id of the uCernVM 2.3-0 image is ami-0000031b</para></listitem>
-<listitem><para>there is a snapshot named ami-00000447.</para></listitem>
-</itemizedlist>
-<para>
 
-In order to get more details about snapshot the option -debug has to be used:
+<para>
+  Please note that for some euca2ools distributions sourcing the ec2rc.sh
+  script is not enough. You need to explictly specify the access and secret
+  keys, and the endpoint, with the relevant command line options:
 
 <screen>
-$ euca-describe-images --debug ami-00000447
+  euca-describe-images -I ${EC2_ACCESS_KEY} -S ${EC2_SECRET_KEY} -U ${EC2_URL}
+</screen>
+</para>
 
+<para>
+  In the example above:
+<itemizedlist>
+  <listitem><para>
+  the EC2 image id of the uCernVM 2.3-0 image is ami-0000031b
+  </para></listitem>
+    
+  <listitem><para>    
+  there is a snapshot whose EC2 is is ami-00000447.
+  </para></listitem>
+</itemizedlist>  
+</para>
+
+
+<para>
+  You can also see all the information of an image, e.g.:
+  
+<screen>
+$ euca-describe-images --debug ami-00000447 
+</screen>
+
+or:
+<screen>
+$ euca-describe-images -I ${EC2_ACCESS_KEY} -S ${EC2_SECRET_KEY} -U ${EC2_URL} --debug ami-00000447 
+</screen>
+
+The returned output will be something like:
+
+<screen>
   &lt;requestId&gt;req-c56c3694-c555-464a-b21d-2c86ccc020be&lt;/requestId&gt;
   &lt;imagesSet&gt;
     &lt;item&gt;
@@ -548,49 +548,7 @@ $ euca-describe-images --debug ami-00000447
 &lt;/DescribeImagesResponse&gt;
 </screen>
 
-where the &lt;name&gt; is the name of the snapshot in openstack
-
 </para>
-<para>
-In order to discover the security group: 
-<screen>
-$ euca-describe-groups
 
-GROUP	1c587619a84f417eabc011321fd559ec	default	Default security group
-PERMISSION  1c587619a84f417eabc011321fd559ec  default  ALLOWS tcp   22  22     FROM     CIDR   0.0.0.0/0
-PERMISSION  1c587619a84f417eabc011321fd559ec  default  ALLOWS icmp  -1	-1     GRPNAME  master_security_group
-PERMISSION  1c587619a84f417eabc011321fd559ec  default  ALLOWS tcp   1   65535  GRPNAME  master_security_group
-PERMISSION  1c587619a84f417eabc011321fd559ec  default  ALLOWS udp   1   65535  GRPNAME  master_security_group
-PERMISSION  1c587619a84f417eabc011321fd559ec  default  ALLOWS icmp  -1	-1     FROM     CIDR   0.0.0.0/0
-</screen>
-</para>
-<para>
-In order to launch a virtual machine:
-
-<screen>
-$ euca-run-instances -t <literal>&lt;flavor&gt;</literal> -k '<literal>&lt;user_key&gt;</literal>' -f user_data_file.txt -g <literal>&lt;security_group&gt;</literal> <literal>&lt;EC2_image_id&gt;</literal>
-</screen>
-
-where the meaning of the parameters is the following:
-<itemizedlist>
-<listitem><para><literal>&lt;EC2_image_id&gt;</literal> is the EC2 image_id of the image that you want to use</para></listitem>
-<listitem><para><literal>&lt;master_security_group&gt;</literal> is a security group that you have created before</para></listitem>
-<listitem><para><literal>&lt;flavor&gt;</literal> is a suitable flavor</para></listitem>
-<listitem><para><literal>&lt;user_key&gt;</literal> is a keypair that you have generated before</para></listitem>
-</itemizedlist>
-</para>
-<para>
-For example, you can instantiate a virtual machine using uCernVM 2.3.0 image, default security group and cldareapd.medium flovar as follows:
-<screen>
-$ euca-run-instances -t cldareapd.medium -k 'pub' -f user_data_file.txt -g 'default' ami-0000031b
-
-RESERVATION     r-6g9688ny      36b1ddb5dab8404dbe7fc359ec95ecf5
-INSTANCE        i-0007e396      ami-0000031b            server-194e81b2-eee2-442c-829b-b8b7de545a49     pending pub     0               cldareapd.medium        2016-09-01T10:17:27.000Z        nova            
-        monitoring-disabled                                     instance-store                                                                  
-</screen>
-</para>
-<note><para>
-The name of your virtual machine will be similar to server-xxx-yyyy and cannot be overridden.
-</para></note>
 </section>
 </chapter>
