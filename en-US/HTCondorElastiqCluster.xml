@@ -105,7 +105,7 @@ where EC2_ACCESS_KEY and EC2_SECRET_KEY are different for each project and user.
   slaves. Currently supported operating systems are RHEL6.x and derivates
   (SL6.x, CentOS6.x, etc.) and Ubuntu. uCernVM based images are also
   supported.
-  For such image you also need to lnow the relevant EC2 (AMI) id
+  For such image you also need to know the relevant EC2 (AMI) id
   (see <xref linkend="HowToFindAMIID"/>).
 </para></listitem>
 
@@ -173,6 +173,7 @@ MAX_VMS=<literal>&lt;max_vms&gt;</literal>
 MIN_VMS=<literal>&lt;min_vms&gt;</literal>
 JOBS_PER_VM=<literal>&lt;jobs_per_vm&gt;</literal>
 IDLE_TIME=<literal>&lt;idle_time&gt;</literal>
+KEY_NAME==<literal>&lt;ssh_key_name&gt;</literal>
 </screen>
 
 <para>
@@ -211,12 +212,25 @@ Where:
 		You have to verify that the number of jobs per VM is compatible with the number of VCPU of the selected flavor.
 		</para></important>
 	</para></listitem>
+
+	
 	
 	<listitem><para>
-	  <literal>&lt;IDLE_TIME&gt;</literal> is the time (in seconds)
-	  after which inactive VMs will be killed.
+	  <literal>&lt;IDLE_TIME&gt;</literal> is the time (in seconds) after
+	  which inactive VMs will be killed.
         </para></listitem>
-       </itemizedlist>
+
+	<listitem><para>
+	  <literal>&lt;KEY_NAME&gt;</literal> is the ssh key
+	  (previously created, as explained in <xref linkend="CreatingAKeypair"/>) to be injected in the batch cluster nodes.
+        </para></listitem>
+
+
+
+
+
+
+</itemizedlist>
 
 	<note><para>
 		The batch system will use each CPU as a separate job slot. So if you have a flavor with 4 cpu, and you submit 1 job, the master will create 1 slave and use 1 of the 4 available CPUs.
@@ -247,7 +261,8 @@ Then you must launch ecm.py file and follow the instructions
 $ python ecm.py
 </screen>
 <para>
-<literal>Chose SO that you want to use for your master and worker nodes</literal>
+  <literal>Choose the operating system installed in the image that you will use
+  for bothe the master and worker nodes</literal>
 </para>
 <screen>
 SO list:
@@ -257,7 +272,7 @@ SO list:
 Which SO do you prefer?
 </screen>
 <important><para>
-You can chose only one of these SO and you have to use it to instantiate both master node and worker node.
+You can choose only one of these SO and you have to use it to instantiate both master node and worker node.
 </para></important>
 <para>
 <literal>Select the image that you want to use</literal>
@@ -272,37 +287,25 @@ Select the image for your Scientific Linux based master and your Scientific Linu
 6: Other image. [WARNING] You have to know the EC2-id of image
 </screen>
 <warning><para>
-If you chose "Other image" you have to manually insert the image id in EC2 format, then you have to know it.
+  If you choose "Other image" you have to manually insert the image id in EC2 format (see <xref linkend="HowToFindAMIID"/>).     
 </para></warning>
 
 <para>
-<literal>Generate the user_data_file and launch your cluster</literal>
+  The script will now print something like:
+
+  <screen>
+    Now you can use the master-scientific-2016-12-04-13.39.05 file to
+    instantiate the master node of your elastiq cluster.
+  </screen>
 </para>
 
-<important>
-<para>If you use Euca2ools option you have to install euca2ools.2.x in your pc.</para>
-<para>If you use Nova CLI option you have to install python-novaclient in your pc. Moreover you have to download <literal>OpenStack RC file</literal> for your project (via dashboard) and source your credential.</para>
-<screen>
-source &lt;project_name&gt;-openrc.sh
-</screen>
-</important>
- 
 
-<screen>
-You can use one of these methods:
-1: Dashboard. [INFO] You use the genereted user_data_file as post-creation file.
-2: Euca2ools. [WARNING] You have to have euca2ools.2.x installed in your PC.
-3: Nova CLI. [WARNING] You have to have nova-client installed in your PC.
-How do you prefer?
-</screen>
+
 
 <para>
-More precisely
-</para>
-<itemizedlist>
-	<listitem>
-		<para>
-		<literal>Dashboard.</literal> Start the master from the dashboard as explained in <xref linkend="CreatingVMs"/>. Go to Instances and here launch a new instance with [Launch Instances].
+  Now you have to start the master node.
+  As explained in <xref linkend="CreatingVMs"/>. go to 'Instances' and create
+  a new instance with [Launch Instances].
 		</para>
 		<para>
 		In the details selects:
@@ -331,34 +334,10 @@ More precisely
 		<para>
 		Then press launch.
 		</para>
-        </listitem>
-	<listitem>
-	<para>
-	<literal>Euca2ools.</literal> You have to insert some others parameters. The program uses these parameters when it configures and launchs the master node. 
-	</para>
-	<itemizedlist>
-		<listitem><para>The name of the flavor.</para></listitem>
-		<listitem><para>The name of the security group.</para><warning><para>You have to insert the name of security group that you created in <xref linkend="Prerequisites"/></para></warning></listitem>
-                <listitem><para>The name of your key pair.</para><warning><para>If your key pair file name is my_key.pem you have to insert only my_key.</para></warning></listitem>
-	</itemizedlist>
-	<note><para>
-	The name of master node will be similar to server-xxx-yyyy.
-	</para></note>
-	</listitem>
-<listitem>
-        <para>
-        <literal>Nova CLI.</literal> You have to insert some others parameters. The program uses these parameters when it configures and launchs the master node.
-        </para>
-        <itemizedlist>
-		<listitem><para>The name of the VM.</para></listitem>
-                <listitem><para>The name of the image.</para></listitem>
-                <listitem><para>The name of the flavor.</para></listitem>
-                <listitem><para>The name of the security group.</para><warning><para>You have to insert the name of security group that you created in <xref linkend="Prerequisites"/></para></warning></listitem>
-                <listitem><para>The name of your key pair.</para><warning><para>If your key pair file name is my_key.pem you have to insert only my_key.</para></warning></listitem>
-        </itemizedlist>
-        </listitem>
-</itemizedlist>
 
+
+
+		
 <para>
   Once you requested the creation of the master node, after some minutes, you will see that the master virtual machine and some slave nodes
 ( depending on the "MIN_VMS" attribute you defined in the ecm.conf) created.
