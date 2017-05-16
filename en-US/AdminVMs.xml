@@ -255,6 +255,40 @@ using their IP numbers.
 </para></warning>
 
 
+<section id="CreatingVMsfromVolumes">
+<title>Improve reliability: creating Virtual Machines from Volumes</title>
+<para>
+By default Virtual Machines are instantiated using the local disk
+of the Cloud compute node.
+This means that, in case of failure of the Compute node, it may 
+happen that the virtual machine content is lost.
+</para>
+
+<para>
+For production servers which are not fully redundant and load balanced, 
+to improve the availability its is advisable to use an external storage
+volume for the system disk of the virtual machine.
+</para>
+
+<para>
+The procedure is the following:
+
+<itemizedlist>
+
+<listitem><para>
+Create a volume using the desired image as source.
+</para></listitem>
+
+<listitem><para>
+Launch a Virtual Machine with that volume as the system disk.
+</para></listitem>
+
+</itemizedlist>
+</para>
+
+
+</section>
+
 </section>
 
 <section id="AccessingVMs">
