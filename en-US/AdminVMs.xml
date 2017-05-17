@@ -52,7 +52,6 @@ button. A new menu appears.
 <mediaobject>
 <imageobject>
   <imagedata condition="pdf" fileref="./images/launchinstances.png" width="450"/>
-  <imagedata condition="web" fileref="./images/launchinstances.png" />
 </imageobject>
 </mediaobject>
 
@@ -80,7 +79,6 @@ You may choose among <replaceable>nova</replaceable> and
 <mediaobject>
 <imageobject>
   <imagedata condition="pdf" fileref="./images/availability_zones.png" width="450"/>
-  <imagedata condition="web" fileref="./images/availability_zones.png" />
 </imageobject>
 </mediaobject>
 
@@ -91,8 +89,10 @@ In this case the ephemeral storage of the VMs is implemented using the local sto
 Cloud compute nodes.
 
 If a compute node of this zone has to be 
-switched off (e.g. for maintenance), the VMs hosted on this compute node must be first migrated
-to other compute nodes. To accomplish this operation, these VMs must be switched off, and won't be 
+switched off (e.g. for maintenance), the VMs hosted on this compute node must be first 
+migrated
+to other compute nodes. To accomplish this operation, these VMs must be switched off, and 
+won't be 
 available for some minutes.
 Virtual Machines hosted on the 'nova' availability zone have better
 performance wrt Virtual Machines hosted on the 'novaLiveMigration' availability zone. 
@@ -151,7 +151,6 @@ Switch the tab for
 <mediaobject>
 <imageobject>
   <imagedata condition="pdf" fileref="./images/launch-accesssec.png" width="450"/>
-  <imagedata condition="web" fileref="./images/launch-accesssec.png" />
 </imageobject>
 </mediaobject>
 
@@ -210,12 +209,12 @@ network if your VM must have a public IP. You will then need to allocate a
 public (floating) IP address to this instance, as explained in 
 <xref linkend="AllocatingFloating"/>. 
 
-<note><para>
+<warning><para>
 By default the possibility to use public IP numbers is disabled and
 therefore by default the <replaceable>&lt;ProjectName&gt;-wan</replaceable>
 network doesn't exist. If public IPs are needed for your
 project, please contact <email>cloud-support@lists.pd.infn.it</email>. 
-</para></note>
+</para></warning>
 
 </para></listitem>
 
@@ -267,7 +266,11 @@ happen that the virtual machine content is lost.
 <para>
 For production servers which are not fully redundant and load balanced, 
 to improve the availability its is advisable to use an external storage
-volume for the system disk of the virtual machine.
+volume for the system disk of the virtual machine. The advantage is also
+that, if the compute node hosting the virtual machine has to be switched
+off e.g. for maintenance, the Cloud administrator before doing
+this operation can live-migrate the instance to another Cloud compute
+node basically without any service interruption.
 </para>
 
 <para>
@@ -285,6 +288,63 @@ Launch a Virtual Machine with that volume as the system disk.
 
 </itemizedlist>
 </para>
+
+<para>
+To create a volume from an image, go to the <replaceable>Volumes</replaceable>
+tab of the Dahsboard, and click on <replaceable>Create Volume</replaceable>.
+</para>
+
+<para>
+After having set the Volume Name, set <replaceable>Image</replaceable> for 
+<replaceable>Volume Source</replaceable> 
+and specify the image name in the <replaceable>Use image as a source</replaceable> field.
+</para>
+
+<para>
+Set the Size of the root disk (<replaceable>Size (GiB)</replaceable> field).
+</para>
+
+<para>
+Complete the operation clicking on <replaceable>Create Volume</replaceable>)
+
+<mediaobject>
+    <imageobject>
+    <imagedata condition="web" fileref="./images/detach_test.png" />
+    </imageobject>
+</mediaobject>
+</para>
+
+<para>
+Once the volume has been created, you can launch the Virtual Machine.
+</para>
+
+<para>
+In the <replaceable>Launch Instance</replaceable> form, that appears after having
+clicked on the <replaceable>Launch Instance</replaceable> button, please select
+<replaceable>Boot from volume</replaceable> in the 
+<replaceable>Instance Boot Source</replaceable> field, and specify the name of the 
+previously created
+volume in the <replaceable>Volume</replaceable>field.
+
+
+<mediaobject>
+    <imageobject>
+    <imagedata condition="web" fileref="./images/detach_test.png" />
+    </imageobject>
+</mediaobject>
+
+</para>
+
+<para>
+Then proceed as explained for the creation of a "normal" instance.
+</para>
+
+<para>
+<note><para>
+You can create only one virtual machine from a volume created using an image as source.
+</para></note>
+</para>
+
 
 
 </section>
