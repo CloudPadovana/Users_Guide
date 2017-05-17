@@ -36,7 +36,8 @@ menu. This will display a list of VMs currently running in your project.
 
 <mediaobject>
 <imageobject>
-  <imagedata fileref="./images/instances.png" />
+  <imagedata condition="web" fileref="./images/instances.png" />
+  <imagedata condition="pdf" fileref="./images/instances.png" width="450" />
 </imageobject>
 </mediaobject>
 
@@ -51,6 +52,7 @@ button. A new menu appears.
 
 <mediaobject>
 <imageobject>
+  <imagedata condition="web" fileref="./images/launchinstances.png" />
   <imagedata condition="pdf" fileref="./images/launchinstances.png" width="450"/>
 </imageobject>
 </mediaobject>
@@ -78,6 +80,7 @@ You may choose among <replaceable>nova</replaceable> and
 
 <mediaobject>
 <imageobject>
+  <imagedata condition="web" fileref="./images/availability_zones.png" />
   <imagedata condition="pdf" fileref="./images/availability_zones.png" width="450"/>
 </imageobject>
 </mediaobject>
@@ -150,6 +153,7 @@ Switch the tab for
 
 <mediaobject>
 <imageobject>
+  <imagedata condition="web" fileref="./images/launch-accesssec.png" />
   <imagedata condition="pdf" fileref="./images/launch-accesssec.png" width="450"/>
 </imageobject>
 </mediaobject>
