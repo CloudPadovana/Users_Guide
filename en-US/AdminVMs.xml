@@ -194,10 +194,12 @@ discussed in <xref linkend="SecurityGroups"/>).
 <listitem><para>
 Swith the tab for <menuchoice><guimenu>Networking</guimenu></menuchoice>.
 
+
+
 <mediaobject>
 <imageobject>
-  <imagedata condition="pdf" fileref="./images/launch-net.png" width="450"/>
   <imagedata condition="web" fileref="./images/launch-net.png" />
+  <imagedata condition="pdf" fileref="./images/launch-net.png" width="450"/>
 </imageobject>
 </mediaobject>
 
@@ -241,7 +243,8 @@ Options include <menuchoice><guimenu>View Log</guimenu></menuchoice> and
 
 <mediaobject>
 <imageobject>
-  <imagedata fileref="./images/instance-more.png" />
+  <imagedata condition="web" fileref="./images/instance-more.png" />
+  <imagedata condition="pdf" fileref="./images/instance-more.png" width="450"/>
 </imageobject>
 </mediaobject>
 
@@ -309,11 +312,12 @@ Set the Size of the root disk (<replaceable>Size (GiB)</replaceable> field).
 </para>
 
 <para>
-Complete the operation clicking on <replaceable>Create Volume</replaceable>)
+Complete the operation clicking on <replaceable>Create Volume</replaceable>.
 
 <mediaobject>
     <imageobject>
-    <imagedata condition="web" fileref="./images/detach_test.png" />
+    <imagedata condition="web" fileref="./images/create_volume_from_image.png" />
+    <imagedata condition="pdf" fileref="./images/create_volume_from_image.png" width="450"/>
     </imageobject>
 </mediaobject>
 </para>
@@ -328,12 +332,13 @@ clicked on the <replaceable>Launch Instance</replaceable> button, please select
 <replaceable>Boot from volume</replaceable> in the 
 <replaceable>Instance Boot Source</replaceable> field, and specify the name of the 
 previously created
-volume in the <replaceable>Volume</replaceable>field.
+volume in the <replaceable>Volume</replaceable> field.
 
 
 <mediaobject>
     <imageobject>
-    <imagedata condition="web" fileref="./images/detach_test.png" />
+    <imagedata condition="web" fileref="./images/launch_from_volume.png" />
+    <imagedata condition="pdf" fileref="./images/launch_from_volume.png" width="450"/>
     </imageobject>
 </mediaobject>
 
