@@ -63,60 +63,6 @@ Here you can enter:
 
 <itemizedlist>
 
-<listitem>
-
-<para>
-<menuchoice><guimenu>Availability Zone</guimenu></menuchoice> defines where (in which part of
-the Cloud infrastructure) the Virtual Machine should be created. 
-</para>
-
-<para>
-You may choose among <replaceable>nova</replaceable> and 
-<replaceable>novaLiveMigration</replaceable>. By default 'nova' should be used. Please use 
-'novaLiveMigration' only if really needed, as explained below.
-</para>
-
-
-
-<mediaobject>
-<imageobject>
-  <imagedata condition="web" fileref="./images/availability_zones.png" />
-  <imagedata condition="pdf" fileref="./images/availability_zones.png" width="450"/>
-</imageobject>
-</mediaobject>
-
-<para>
-For "standard" instances (e.g. worker nodes that can be easily recreated in case of fault)
-the <replaceable>nova</replaceable> availability zone must be used. 
-In this case the ephemeral storage of the VMs is implemented using the local storage of the relevant 
-Cloud compute nodes.
-
-If a compute node of this zone has to be 
-switched off (e.g. for maintenance), the VMs hosted on this compute node must be first 
-migrated
-to other compute nodes. To accomplish this operation, these VMs must be switched off, and 
-won't be 
-available for some minutes.
-Virtual Machines hosted on the 'nova' availability zone have better
-performance wrt Virtual Machines hosted on the 'novaLiveMigration' availability zone. 
-
-</para>
-
-
-<para>
-The availability zone <replaceable>novaLiveMigration</replaceable> comprises a small set
-of Cloud compute nodes supporting Live Migration: thanks to 
-a shared file system used to host instances, if a compute node of this zone has to be 
-switched off (e.g. for maintenance), the Cloud admin can move the VMs hosted by this compute node 
-on other compute nodes of the same zone, basically without any service interruption.
-Please use this availability zone <literal>only</literal> for critical services (e.g. NFS servers).
-Virtual Machines hosted on the 'novaLiveMigration' availability zone have worst 
-performance wrt Virtual Machines hosted on the 'nova' availability zone. 
-</para>
-
-
-
-</listitem>
 
 
 <listitem><para>
