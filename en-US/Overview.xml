@@ -129,5 +129,27 @@ All registered users to the Cloud are member of this mailing list.
 </section>
 
 
+<section id="Ack">
+<title>Acknowledge Cloud Area Padovana in your paper</title>
+
+
+<para>    
+If you wish to give credit for the use of the Cloud Area Padovana 
+infrastructure in your scientific publication or elsewhere, the following 
+quote can be used:
+</para>
+<para>
+<blockquote>
+<para>"Cloud Area Padovana is acknowledged for the use of computing and storage facilities."</para>
+</blockquote>
+</para>
+<para>
+This paper can also be used as a reference:
+<ulink url="http://iopscience.iop.org/article/10.1088/1742-6596/664/2/022016">
+Implementation and use of a highly available and innovative IaaS solution: the Cloud Area Padovana</ulink>
+</para>
+
+
+</section>
 
 </chapter>
