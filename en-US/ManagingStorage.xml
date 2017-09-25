@@ -88,7 +88,7 @@ Using the Dashboard, click on
 <menuchoice><guimenu>Create Volume</guimenu></menuchoice>. 
 In the "Create Volume” window specify the name of the volume 
 (<replaceable>testvol</replaceable> in the example below) and the desired 
-size (<replaceable>12 GB</replaceable> in the example).
+size (<replaceable>50 GB</replaceable> in the example).
 As <menuchoice><guimenu>Volume Source</guimenu></menuchoice> specify “No source, empty volume”. 
 
 <mediaobject>
@@ -99,11 +99,74 @@ As <menuchoice><guimenu>Volume Source</guimenu></menuchoice> specify “No sourc
 
 <mediaobject>
 <imageobject>
-  <imagedata fileref="./images/testvolCreation.jpg" />
+  <!--imagedata fileref="./images/testvolCreation.jpg" /-->
+  <imagedata condition="web" fileref="./images/testvolCreation-new.png" />
+  <imagedata condition="pdf" fileref="./images/testvolCreation-new.png" width="450" />
 </imageobject>
 </mediaobject>
 
 </para>
+
+<para>
+Multiple volume types exist, and you might also want/need to specify the
+type to be used for the volume to be created  
+(in the example above the <replaceable>iscsi-infnpd</replaceable> volume type
+was chosen).
+</para>
+
+<para>
+If not specified the default <replaceable>ceph</replaceable> volume type will be 
+used.
+</para>
+
+<para>
+You might need to specify the volume type in particular because different
+quotas for the different volume types might have been set for your project.
+Unfortunately the OpenStack dashboard shows only the overall quota. To see the quota 
+per each volume type you need to use the OpenStack CLI (as explained in 
+<xref linkend="AccessingtheCloudthroughCLI"/>) and run the
+<literal>cinder quota-usage ${OS_PROJECT_ID}</literal> command.
+</para>
+
+<para>
+E.g.:
+
+<screen>
+$ cinder quota-usage ${OS_PROJECT_ID}
++------------------------+--------+----------+-------+
+| Type                   | In_use | Reserved | Limit |
++------------------------+--------+----------+-------+
+| backup_gigabytes       | 0      | 0        | 1000  |
+| backups                | 0      | 0        | 10    |
+| gigabytes              | 105    | 0        | 300   |
+| gigabytes_ceph         | 70     | 0        | 100   |
+| gigabytes_gluster      | 0      | 0        | -1    |
+| gigabytes_iscsi-infnpd | 35     | 0        | 200   |
+| per_volume_gigabytes   | 0      | 0        | 1000  |
+| snapshots              | 0      | 0        | 10    |
+| snapshots_ceph         | 0      | 0        | -1    |
+| snapshots_gluster      | 0      | 0        | -1    |
+| snapshots_iscsi-infnpd | 0      | 0        | -1    |
+| volumes                | 7      | 0        | 20    |
+| volumes_ceph           | 5      | 0        | -1    |
+| volumes_gluster        | 0      | 0        | -1    |
+| volumes_iscsi-infnpd   | 2      | 0        | -1    |
++------------------------+--------+----------+-------+
+</screen>
+</para>
+
+
+<para>
+In this example the project was given 300 GB. For the iscsi-infnpd
+volume type the quota is 200 GB, while for the ceph
+volume type it is possible to use at most 100 GB.
+</para>
+
+<warning><para>
+If you try to create a volume using a type for which the quota is over,
+you will see a generic 'Unable to create volume' error message.
+</para></warning>
+
 </section>
 
 <section id="AttachVolume">
