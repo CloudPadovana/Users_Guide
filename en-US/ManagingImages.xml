@@ -31,16 +31,16 @@ menu.
 </para>
 
 <para>
-The <literal>SL6x-x86-64-&lt;date&gt;</literal> is a basic 
-SL6.x image which
-also includes cloud-init to perform contextualization based on the user data 
-specified when the VM are instantiated. It also configures CVMFS and the
+The <literal>SL6x-Padova-x86-64-&lt;date&gt;</literal> and
+<literal>CentOS7x-Padova-x86-64-&lt;date&gt;</literal> images
+are basic SL6.x / CentOS 7.x images which
+also include cloud-init to perform contextualization based on the user data 
+specified when the VM are instantiated. They also configure CVMFS and the
 relevant squid servers.
 </para>
 
 <para>
-The <literal>SL6x-x86-64-&lt;date&gt;</literal> image, wrt the
-<literal>SL6x-x86-64-&lt;date&gt;</literal> image, also configures the
+Such images also configure the
 Padova LDAP server for user authentication. This means that it is just 
 necessary to “enable” the relevant accounts on the VM adding in the 
 /etc/passwd file:
@@ -65,10 +65,20 @@ should help.
 </para>
  
 
+<note>
 <para>
-In the production cloud SL 6.x images are provided in QCOW2 format.
-They are fully resizable also with respect to the disk size.
+The <literal>SL6x-Padova-x86-64-&lt;date&gt;</literal> and
+<literal>CentOS7x-Padova-x86-64-&lt;date&gt;</literal> images
+(with date &ge; 2017) also allow INFN-Padova system administrators
+to log (with admin privileges) on the instance. 
 </para>
+
+<para>
+<ulink url="http://www.pd.infn.it/calcolo/indexEN.html">INFN-Padova computing and Network service</ulink> 
+(<email>supporto@pd.infn.it</email>) can provide support only for
+instances created using such images (only to INFN-Padova users).
+</para>
+</note>
 
 
 </section>

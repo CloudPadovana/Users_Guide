@@ -121,6 +121,18 @@ If you have problems using the Cloud dell'area Padovana private cloud, please
 contact the admins at <email>cloud-support@lists.pd.infn.it</email>.
 </para>
 
+<warning><para>
+The Cloud Area Padovana support team provides support on the Cloud infrastructure,
+but doesn't provide support on the virtual machines you instatiated on the Cloud.
+</para>
+
+<para>
+<ulink url="http://www.pd.infn.it/calcolo/indexEN.html">INFN-Padova computing and Network service</ulink>
+can provide support only to INFN-Padova users and only for instances created using "blessed" images,
+(as described in <xref linkend="PublicImages"/>).
+</para></warning>
+
+
 <para>                                                                             
 Changes and planned interventions to the service will be posted on the             
 <email>cloud-users@pd.infn.it</email>.                                       
