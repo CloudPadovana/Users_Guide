@@ -7,6 +7,15 @@
 <chapter id="ManagingContainers">
 <title>Managing Containers</title>
 
+
+<warning><para>
+The support for container in OpenStack described in this chapter
+is implemented through a software component
+(nova-docker) that is not supported anymore. In particular it won't be 
+available in the next OpenStack release that will be installed. 
+</para></warning>
+
+
 <para>
 The Cloud Area Padovana provides an experimental service to run Docker Containers in a cloud environment.
 </para>
