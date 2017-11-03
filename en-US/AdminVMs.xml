@@ -281,6 +281,12 @@ Complete the operation clicking on <replaceable>Create Volume</replaceable>.
 </mediaobject>
 </para>
 
+<note>
+<para>
+Please select 'ceph' (the default) as type for the volume
+</para>
+</note>
+
 <para>
 Once the volume has been created, you can launch the Virtual Machine.
 </para>
