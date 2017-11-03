@@ -213,7 +213,7 @@ For Virtual Machines supposed to have a long life, users may
 ask (contacting <email>cloud-support@lists.pd.infn.it</email>)
 to have them registered in the DNS. 
 If possible (i.e. if the chosen names are sensible enough and it there are
-no ambuguities) the registered names in the DNS will be the same as the ones
+no ambiguities) the registered names in the DNS will be the same as the ones
 chosen as Instance names.
 </para>
 
