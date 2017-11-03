@@ -213,7 +213,7 @@ For Virtual Machines supposed to have a long life, users may
 ask (contacting <email>cloud-support@lists.pd.infn.it</email>)
 to have them registered in the DNS. 
 If possible (i.e. if the chosen names are sensible enough and it there are
-no ambuguities) the registered names in the DNS can be the same as the ones
+no ambuguities) the registered names in the DNS will be the same as the ones
 chosen as Instance names.
 </para>
 
@@ -347,11 +347,8 @@ $ ssh -i ~/private/my_key root@10.64.15.3
 
 <para>
 <warning><para>
-Please note that VMs of the Cloud are by default not registered in the DNS, 
-and therefore you must use the IP address.
-
-As explained before, registration in the DNS must be explicitly 
-required and is possible only for machines supposed to live forever. 
+Please note that, unless you asked for the registration of your VMs in the DNS,
+you must use their IP addresses to access them.
 </para></warning>
 </para>
 
