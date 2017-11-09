@@ -168,7 +168,7 @@ $ git clone https://github.com/CloudPadovana/ECM.git
 </para>
 <screen>
 $ cat ecm.conf
-WNS_FLAVOR=<literal>&lt;flavor_name&gt;</literal>
+FLAVOR_VMS=<literal>&lt;flavor_name&gt;</literal>
 MAX_VMS=<literal>&lt;max_vms&gt;</literal>
 MIN_VMS=<literal>&lt;min_vms&gt;</literal>
 JOBS_PER_VM=<literal>&lt;jobs_per_vm&gt;</literal>
@@ -181,7 +181,7 @@ Where:
 </para>
 <itemizedlist>
         <listitem><para> 
-	  <literal>&lt;WNS_FLAVOR&gt;</literal> is the name of the
+	  <literal>&lt;FLAVOR_VMS&gt;</literal> is the name of the
 	  flavor to be used for the slave nodes.
 	  Flavors have been discussed in <xref linkend="Flavors"/>. 
 	  Available flavors are listed in the dashboard when you try to
@@ -265,26 +265,28 @@ $ python ecm.py
   for bothe the master and worker nodes</literal>
 </para>
 <screen>
-SO list:
-1: Scientific Linux
+Choose the Operating System (OS) type that you want to use for your master and worker nodes:
+1: Scientific Linux 6
 2: Ubuntu
 3: uCernVM
-Which SO do you prefer?
+4: CentOS 7
+OS type ?
 </screen>
 <important><para>
-You can choose only one of these SO and you have to use it to instantiate both master node and worker node.
+You can choose only one of these SO and you have to use it to instantiate both master node and worker nodes.
 </para></important>
 <para>
 <literal>Select the image that you want to use</literal>
 </para>
 <screen>
-Select the image for your Scientific Linux based master and your Scientific Linux based WNs:
-1: SL67-x86_64-20151017
-2: SL66-x86_64-20150521
-3: SL66-x86_64-20150309
-4: SL66-x86_64-20150131
-5: SL65-x86_64-20151029
-6: Other image. [WARNING] You have to know the EC2-id of image
+Select the image for your Scientific Linux 6 based master and your Scientific Linux 6 based WNs:
+1: SL68-x86_64-20161107
+2: SL67-x86_64-20151017
+3: SL66-x86_64-20150521
+4: SL66-x86_64-20150309
+5: SL66-x86_64-20150131
+6: SL65-x86_64-20151029
+7: Other image. [WARNING] You have to know the EC2-id of image
 </screen>
 <warning><para>
   If you choose "Other image" you have to manually insert the image id in EC2 format (see <xref linkend="HowToFindAMIID"/>).     
@@ -295,7 +297,7 @@ Select the image for your Scientific Linux based master and your Scientific Linu
 
   <screen>
     Now you can use the master-scientific-2016-12-04-13.39.05 file to
-    instantiate the master node of your elastiq cluster.
+    instantiate the master node of your elastic cluster.
   </screen>
 </para>
 
@@ -369,6 +371,17 @@ You might also consider to rely on the User LDAP, as explained in <xref linkend=
 </para>
 </section>
 
+<section id="HowSlaveNodesAreConfigured">
+<title>How slave nodes are installed and configured</title>
+
+<para>
+The istantiation of slaves nodes is managed by elastiq service running in the master node. The min and max number of nodes is set by user in the ecm.conf and the total number of active nodes will change dinamically with jobs need. The installation of condor and its configuration on slaves is automatically provided by ECM. Inside the user_data_file created by the ecm.py script there is the parameter SLAVE_USERDATA whose value is the script for the installation and configuration of the slave, coded in b64.
+The original script used for condor installation and configuration on slaves is stored in the ECM/slave directory. There is a file for each Operating system, depending on the system selected for the master.
+Generally the user doesn't need to modify these files, they provide the basic configuration for condor, for universe Vanilla and Docker. But if you need to modify the condor configuration or install additional packages on the slave, this script can be modified and the ecm program will take care to code it in b64 and add the new value to the SLAVE_USERDATA parameter in the user_data_file.
+</para>
+
+</section>
+
 <section id="UseTheCluster">
 <title>Use the elastic cluster</title>
 
@@ -399,6 +412,19 @@ slot2@10-64-22-84. LINUX      X86_64 Unclaimed Idle      0.000 1977  2+12:45:25
 
                Total     2     0       0         2       0          0        0
 </screen>
+
+Check if Docker is enabled the cluster:
+
+<screen>
+# condor_status -l | grep -i Docker
+StarterAbilityList = "HasTDP,HasEncryptExecuteDirectory,HasFileTransferPluginMethods,HasJobDeferral,HasJICLocalConfig,HasJICLocalStdin,HasPerFileEncryption,HasDocker,HasFileTransfer,HasReconnect,HasVM,HasMPI,HasRemoteSyscalls,HasCheckpointing"
+DockerVersion = "Docker version 1.7.1, build 786b29d/1.7.1"
+HasDocker = true
+StarterAbilityList = "HasTDP,HasEncryptExecuteDirectory,HasFileTransferPluginMethods,HasJobDeferral,HasJICLocalConfig,HasJICLocalStdin,HasPerFileEncryption,HasDocker,HasFileTransfer,HasReconnect,HasVM,HasMPI,HasRemoteSyscalls,HasCheckpointing"
+DockerVersion = "Docker version 1.7.1, build 786b29d/1.7.1"
+HasDocker = true
+</screen>
+
 </para>
 
 
@@ -406,7 +432,7 @@ slot2@10-64-22-84. LINUX      X86_64 Unclaimed Idle      0.000 1977  2+12:45:25
   Create you HTCondor classad.
   
 A simple example is the following:
-</para>
+
 <screen>
 $ cat test.classad
 
@@ -418,12 +444,10 @@ Error = test.err.$(Cluster)$(Process)
 Queue &lt;number_of_jobs_to_submit&gt;
 </screen>
 
-<para>
 where <literal>test.sh</literal> is the executable you want to run.
 
-</para>
-<para>
 Submit your jobs issuing the command:
+
 <screen>
 $ condor_submit test.classad
 </screen>
@@ -432,8 +456,28 @@ and check their status with:
 $ condor_q
 </screen>
 
+A simple example using a container. The container is downloaded from docker-hub
+
+<screen>
+$ cat test-docker.classad
+
+universe = docker
+docker_image = debian
+executable = /bin/cat  
+arguments = /etc/hosts 
+should_transfer_files = YES
+when_to_transfer_output = ON_EXIT
+Log = test-docker.log.$(Cluster).$(Process)
+Output = test-docker.out.$(Cluster).$(Process)
+Error = test-docker.err.$(Cluster).$(Process)
+request_memory = 100M
+Queue &lt;number_of_jobs_to_submit&gt;
+</screen>
+
+
 You can find documentation about HTCondor <ulink url="http://research.cs.wisc.edu/htcondor/manual/">here</ulink>.
 </para>
+
 </section>
 
 
