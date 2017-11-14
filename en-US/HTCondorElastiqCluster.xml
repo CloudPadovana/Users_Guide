@@ -8,7 +8,8 @@
 
 <para>
   The virtual machines provided by the Cloud Area Padovana can also be used to
-  implement batch clusters where users can run their jobs.
+  implement batch clusters where users can run their applications (that can be
+  normal jobs or docker containers).
 </para>
 <para>
 In this chapter we explain how to implement a dynamic batch cluster based
@@ -36,7 +37,8 @@ on <ulink url="http://research.cs.wisc.edu/htcondor/manual/">HTCondor</ulink>.
 </para>
 
 <para>
-  You can log in on the master node and submit jobs to the batch system. These jobs will be run on the slave nodes, get done, and eventually the slaves will be released. 
+  The master node will act also as submitting machine:
+  you can log in on this node and submit jobs to the batch system. These jobs will be run on the slave nodes, get done, and eventually the slaves will be released. 
 </para>
 
 <note>
