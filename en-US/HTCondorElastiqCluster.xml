@@ -105,7 +105,7 @@ where EC2_ACCESS_KEY and EC2_SECRET_KEY are different for each project and user.
 <listitem><para>
   You need to identify the image to be used for the master and for the
   slaves. Currently supported operating systems are RHEL6.x and derivates
-  (SL6.x, CentOS6.x, etc.) and Ubuntu. uCernVM based images are also
+  (SL6.x, CentOS6.x, etc.), RHEL7.x and derivates, and Ubuntu. uCernVM based images are also
   supported.
   For such image you also need to know the relevant EC2 (AMI) id
   (see <xref linkend="HowToFindAMIID"/>).
@@ -235,8 +235,8 @@ Where:
 </itemizedlist>
 
 	<note><para>
-		The batch system will use each CPU as a separate job slot. So if you have a flavor with 4 cpu, and you submit 1 job, the master will create 1 slave and use 1 of the 4 available CPUs.
-		If you submit 4 jobs, again the master will create 1 slave, and will use all the 4 CPUs. Large flavors means less
+		The batch system will use each VCPU as a separate job slot. So if you have a flavor with 4 VCPUs, and you submit 1 job, the master will create 1 slave and use 1 of the 4 available VCPUs.
+		If you submit 4 jobs, again the master will create 1 slave, and will use all the 4 VCPUs. Large flavors means less
 		machines to be created but possibly a sub-optimal usage of resources.
 		</para></note>
 </section>
@@ -377,9 +377,23 @@ You might also consider to rely on the User LDAP, as explained in <xref linkend=
 <title>How slave nodes are installed and configured</title>
 
 <para>
-The istantiation of slaves nodes is managed by elastiq service running in the master node. The min and max number of nodes is set by user in the ecm.conf and the total number of active nodes will change dinamically with jobs need. The installation of condor and its configuration on slaves is automatically provided by ECM. Inside the user_data_file created by the ecm.py script there is the parameter SLAVE_USERDATA whose value is the script for the installation and configuration of the slave, coded in b64.
-The original script used for condor installation and configuration on slaves is stored in the ECM/slave directory. There is a file for each Operating system, depending on the system selected for the master.
-Generally the user doesn't need to modify these files, they provide the basic configuration for condor, for universe Vanilla and Docker. But if you need to modify the condor configuration or install additional packages on the slave, this script can be modified and the ecm program will take care to code it in b64 and add the new value to the SLAVE_USERDATA parameter in the user_data_file.
+The istantiation of slaves nodes is managed by the elastiq service running in the master node. 
+</para>
+
+<para>
+The min and max number of nodes is set by user in the ecm.conf: the total number of active nodes will change dinamically with jobs need. 
+</para>
+
+<para>
+The installation of condor and its configuration on slaves is automatically provided by ECM. Inside the user_data_file created by the ecm.py script there is the parameter SLAVE_USERDATA whose value is the script for the installation and configuration of the slave, coded in b64.
+The original uncoded script used for condor installation and configuration on slaves is stored in the ECM/slave_files directory. There is a file for each Operating system, depending on the system selected for the master.
+These files provide the basic configuration for condor, to support both the Vanilla and Docker universes.
+</para>
+
+<para>
+Generally the user doesn't need to modify these files. If, for some reasons, you need to modify the condor configuration or you need to install additional packages on 
+the slaves, this script can be modified: ECM will take care to code it in b64 and add the new value to the SLAVE_USERDATA parameter in the 
+user_data_file.
 </para>
 
 </section>
@@ -389,7 +403,7 @@ Generally the user doesn't need to modify these files, they provide the basic co
 
 
 <para>
-  Log to the master node using your unpriviledged account.
+  Log on the master node using your unpriviledged account.
 
 Check if condor is running with the command:
 <screen>
@@ -415,7 +429,59 @@ slot2@10-64-22-84. LINUX      X86_64 Unclaimed Idle      0.000 1977  2+12:45:25
                Total     2     0       0         2       0          0        0
 </screen>
 
-Check if Docker is enabled the cluster:
+
+  Create you HTCondor classad.
+</para>
+  
+<para>
+A simple example is the following:
+
+<screen>
+$ cat test.classad
+
+Universe = vanilla
+Executable = /home/&lt;username&gt;/test.sh
+Log = test.log.$(Cluster)$(Process)
+Output = test.out.$(Cluster)$(Process)
+Error = test.err.$(Cluster)$(Process)
+Queue &lt;number_of_jobs_to_submit&gt;
+</screen>
+
+where <literal>test.sh</literal> is the executable you want to run.
+</para>
+
+<para>
+Submit your jobs issuing the command:
+
+<screen>
+$ condor_submit test.classad
+</screen>
+and check their status with: 
+<screen>
+$ condor_q
+</screen>
+
+
+<note><para>
+You can find documentation about HTCondor <ulink url="http://research.cs.wisc.edu/htcondor/manual/">here</ulink>.
+</para></note>
+
+</para>
+
+
+</section>
+
+
+<section id="RunningContainers">
+<title>Use the elastic cluster to run docker containers</title>
+
+<para>
+The HTCondor elastic cluster can also be used to run docker containers. 
+You don't need to install docker on your images: this is done by ECM.
+</para>
+
+<para>
+Once the cluster is created, check if Docker is enabled on the slaves:
 
 <screen>
 # condor_status -l | grep -i Docker
@@ -431,34 +497,7 @@ HasDocker = true
 
 
 <para>
-  Create you HTCondor classad.
-  
-A simple example is the following:
-
-<screen>
-$ cat test.classad
-
-Universe = vanilla
-Executable = /home/&lt;username&gt;/test.sh
-Log = test.log.$(Cluster)$(Process)
-Output = test.out.$(Cluster)$(Process)
-Error = test.err.$(Cluster)$(Process)
-Queue &lt;number_of_jobs_to_submit&gt;
-</screen>
-
-where <literal>test.sh</literal> is the executable you want to run.
-
-Submit your jobs issuing the command:
-
-<screen>
-$ condor_submit test.classad
-</screen>
-and check their status with: 
-<screen>
-$ condor_q
-</screen>
-
-A simple example using a container. The container is downloaded from docker-hub
+The following is a simple example which runs a docker container, which is downloaded from docker-hub:
 
 <screen>
 $ cat test-docker.classad
@@ -477,7 +516,6 @@ Queue &lt;number_of_jobs_to_submit&gt;
 </screen>
 
 
-You can find documentation about HTCondor <ulink url="http://research.cs.wisc.edu/htcondor/manual/">here</ulink>.
 </para>
 
 </section>
