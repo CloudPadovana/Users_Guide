@@ -31,8 +31,8 @@ menu.
 </para>
 
 <para>
-The <literal>SL6x-Padova-x86-64-&lt;date&gt;</literal> and
-<literal>CentOS7x-Padova-x86-64-&lt;date&gt;</literal> images
+The <literal>SL6x-INFNPadova-x86-64-&lt;date&gt;</literal> and
+<literal>CentOS7x-INFNPadova-x86-64-&lt;date&gt;</literal> images
 are basic SL6.x / CentOS 7.x images which
 also include cloud-init to perform contextualization based on the user data 
 specified when the VM are instantiated. They also configure CVMFS and the
@@ -67,9 +67,9 @@ should help.
 
 <note>
 <para>
-The <literal>SL6x-Padova-x86-64-&lt;date&gt;</literal> and
-<literal>CentOS7x-Padova-x86-64-&lt;date&gt;</literal> images
-(with date &ge; 2017) also allow INFN-Padova system administrators
+The <literal>SL6x-INFNPadova-x86-64-&lt;date&gt;</literal> and
+<literal>CentOS7x-INFNPadova-x86-64-&lt;date&gt;</literal> images
+also allow INFN-Padova system administrators
 to log (with admin privileges) on the instance. 
 </para>
 
@@ -409,7 +409,8 @@ should help.
 </para>
 
 <note><para>
-Please note that the images <literal>SL6x-Padova-x86-64-&lt;date&gt;</literal>
+Please note that the <literal>SL6x-INFNPadova-x86-64-&lt;date&gt;</literal>
+and <literal>CentOS7x-INFNPadova-x86-64-&lt;date&gt;</literal> images
 have already the LDAP client 
 properly configured to use the Padova LDAP server. 
 Using these images it is just necessary to enable the 

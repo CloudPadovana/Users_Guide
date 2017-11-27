@@ -209,7 +209,7 @@ using their IP numbers.
 </para>
 
 <para>
-For Virtual Machines supposed to have a long life, users may
+For Virtual Machines supposed to have a long life, INFN Padova users may
 ask (contacting <email>cloud-support@lists.pd.infn.it</email>)
 to have them registered in the DNS. 
 If possible (i.e. if the chosen names are sensible enough and it there are
