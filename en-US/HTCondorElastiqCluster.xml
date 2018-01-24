@@ -4,83 +4,73 @@
 %BOOK_ENTITIES;
 ]>
 <chapter id="HTCondorElastiqCluster">
-<title>Creating Batch Clusters on the Cloud</title>
+  <title>Creating Batch Clusters on the Cloud</title>
 
-<para>
-  The virtual machines provided by the Cloud Area Padovana can also be used to
-  implement batch clusters where users can run their applications (that can be
-  normal jobs or docker containers).
-</para>
-<para>
-In this chapter we explain how to implement a dynamic batch cluster based
-on <ulink url="http://research.cs.wisc.edu/htcondor/manual/">HTCondor</ulink>.
-</para>
+  <para>
+    The virtual machines provided by the Cloud Area Padovana can also be used to
+    implement batch clusters where users can run their applications (that can be
+    normal jobs or docker containers).
+  </para>
+  <para>
+    In this chapter we explain how to implement a dynamic batch cluster based
+    on <ulink url="http://research.cs.wisc.edu/htcondor/manual/">HTCondor</ulink>.
+  </para>
+  <section id="TheIdea">
+    <title>Intro: the idea</title>
+    <para>                                                                         
+      You create on the cloud a virtual machine that acts as a master for a dynamic
+      batch system (implemented using HTCondor).
+      When you create the master, using the instructions reported in
+      <xref linkend="CreatingVMs"/>, you will need to specify some user-data to describe the cluster
+      configuration, as described below.
+    </para>  
+
+    <para>
+      The master node will be able to
+      spawn (using the EC2 euca2ools) new slave nodes (where jobs are executed) when jobs are submitted to the batch system. The elastic cluster will provide a number of virtual resources that scales up or down depending on your need. The total number of active virtual nodes is dynamic.
+    </para>
+
+    <para>
+      The master node will act also as submitting machine:
+      you can log in on this node and submit jobs to the batch system. These jobs will be run on the slave nodes, get done, and eventually the slaves will be released.
+    </para>
+
+    <note>
+      <para>
+	The master and the slaves must use the same image (which should have
+	all the needed software). However the master can use a different flavor with
+	respect to the slave nodes.
+      </para>
+    </note>
+    
+  </section>
   
- 
+  <section id="Prerequisites">
+    <title>Prerequisites</title>
+    <para>
+      <itemizedlist>
+	<listitem><para>You should be registered in the Cloud as member of a project.</para></listitem>
+	
+	<listitem><para>
+	  You need to have created a SSH key-pairs, ad explained in
+	  <xref linkend="CreatingAKeypair"/>.
+	  This will allow to log in the master and in the slave nodes.
+	</para></listitem>
 
-  
-
-<section id="TheIdea">
-<title>Intro: the idea</title>
-<para>                                                                         
-  You create on the cloud a virtual machine that acts as a master for a dynamic
-  batch system (implemented using HTCondor).
-  When you create the master, using the instructions reported in
-  <xref linkend="CreatingVMs"/>, you will need to specify some user-data to describe the cluster
-  configuration, as described below.
-</para>  
-
-
-<para>
-  The master node will be able to
-  spawn (using the EC2 euca2ools) new slave nodes (where jobs are executed) when jobs are submitted to the batch system. The elastic cluster will provide a number of virtual resources that scales up or down depending on your need. The total number of active virtual nodes is dynamic.
-</para>
-
-<para>
-  The master node will act also as submitting machine:
-  you can log in on this node and submit jobs to the batch system. These jobs will be run on the slave nodes, get done, and eventually the slaves will be released. 
-</para>
-
-<note>
-<para>
-  The master and the slaves must use the same image (which should have
-  all the needed software). However the master can use a different flavor with
-  respect to the slave nodes.
-</para>
-</note>
-
-</section>
-
-
-
-
-
-<section id="Prerequisites">
-<title>Prerequisites</title>
-<para>
-<itemizedlist>
-  <listitem><para>You should be registered in the Cloud as member of a project.</para></listitem>
-
-<listitem><para>
-  You need to have created a SSH key-pairs, ad explained in
-  <xref linkend="CreatingAKeypair"/>.
-  This will allow to log in the master and in the slave nodes.
-</para></listitem>
-
-<listitem><para>You need to download the EC2 credentials of the project you want to use (see <xref linkend="AccessingtheCloudthroughEC2"/>). You can download them from the dashboard as following:</para>
-<para>Open the dashboard, select the project (drop down menu on top left of the dashboard), go to Access &amp; Security (under the 'Compute' section), go to
-'Api Access' section and here click on [Download EC2 credentials].</para>
-<para>You'll get a zip file with a name like: Project-x509.zip , where Project is the one you have chosen. The zip contains the following files:
-<screen>
+	<listitem><para>You need to download the EC2 credentials of the project you want to use (see <xref linkend="AccessingtheCloudthroughEC2"/>). You can download them from the dashboard as following:</para>
+	<para>Open the dashboard, select the project (drop down menu on top left of the dashboard), go to Access &amp; Security (under the 'Compute' section), go to
+	'Api Access' section and here click on [Download EC2 credentials].</para>
+	<para>You'll get a zip file with a name like: Project-x509.zip , where Project is the one you have chosen. The zip contains the following files:
+	<screen>
 $ unzip Project-x509.zip
 Archive:  Project-x509.zip
 extracting: pk.pem
 extracting: cert.pem
 extracting: cacert.pem
 extracting: ec2rc.sh
-</screen>
-Extract all these files somewhere safe. The content of your ec2rc.sh file is something like:
-<screen>
+	</screen>
+	Extract all these files somewhere safe. The content of your ec2rc.sh file is something like:
+	<screen>
 $ cat ec2rc.sh
 
 #!/bin/bash
@@ -98,25 +88,25 @@ export EUCALYPTUS_CERT=${NOVA_CERT} # euca-bundle-image seems to require this se
 
 alias ec2-bundle-image="ec2-bundle-image --cert ${EC2_CERT} --privatekey ${EC2_PRIVATE_KEY} --user 42 --ec2cert ${NOVA_CERT}"
 alias ec2-upload-bundle="ec2-upload-bundle -a ${EC2_ACCESS_KEY} -s ${EC2_SECRET_KEY} --url ${S3_URL} --ec2cert ${NOVA_CERT}"
-</screen>
-where EC2_ACCESS_KEY and EC2_SECRET_KEY are different for each project and user. The elastiq service uses these values to instantiate and to kill VMs in the specific project.
-</para></listitem>
+	</screen>
+	where EC2_ACCESS_KEY and EC2_SECRET_KEY are different for each project and user. The elastiq service uses these values to instantiate and to kill VMs in the specific project.
+	</para></listitem>
+	
+	<listitem><para>
+	  You need to identify the image to be used for the master and for the
+	  slaves. Currently supported operating systems are RHEL6.x and derivates
+	  (SL6.x, CentOS6.x, etc.), RHEL7.x and derivates, and Ubuntu. uCernVM based images are also
+	  supported.
+	  For such image you also need to know the relevant EC2 (AMI) id
+	  (see <xref linkend="HowToFindAMIID"/>).
+	</para></listitem>
 
-<listitem><para>
-  You need to identify the image to be used for the master and for the
-  slaves. Currently supported operating systems are RHEL6.x and derivates
-  (SL6.x, CentOS6.x, etc.), RHEL7.x and derivates, and Ubuntu. uCernVM based images are also
-  supported.
-  For such image you also need to know the relevant EC2 (AMI) id
-  (see <xref linkend="HowToFindAMIID"/>).
-</para></listitem>
 
-
-<listitem><para>
-  You need to set a specific security group to be used for the master node.
-  This security group must include the following rules:
-</para>
-<screen>
+	<listitem><para>
+	  You need to set a specific security group to be used for the master node.
+	  This security group must include the following rules:
+	</para>
+	<screen>
 Direction    Ether Type    IP Protocol    Port Range         Remote IP Prefix
 Egress       IPv4          Any            Any                0.0.0.0/0	
 Egress       IPv6          Any            Any                ::/0	
@@ -124,13 +114,13 @@ Ingress      IPv4          ICMP           Any                0.0.0.0/0
 Ingress      IPv4          TCP            22 (SSH)           0.0.0.0/0	
 Ingress      IPv4          TCP            9618               0.0.0.0/0	
 Ingress      IPv4          TCP            41000 - 42000      0.0.0.0/0
-</screen>
-<note><para>
-  Instead of modifying the rules of an existing security group, we suggest to
-  create a new security group named e.g. "master_security_group".
-  Security groups are discussed in 
-  <xref linkend="SecurityGroups"/>.
-</para></note>
+	</screen>
+	<note><para>
+	  Instead of modifying the rules of an existing security group, we suggest to
+	  create a new security group named e.g. "master_security_group".
+	  Security groups are discussed in 
+	  <xref linkend="SecurityGroups"/>.
+	</para></note>
 
 <para>
   The slave nodes will instead use the <literal>default</literal> security
@@ -646,4 +636,198 @@ The returned output will be something like:
 </para>
 
 </section>
+
+<section id="Troubleshooting">
+  <title>How to restart the elastic cluster</title>
+  <para>
+    <literal>Check the cluster status</literal>
+  </para>
+  <para>
+    When you restart the elastic cluster you can check that all work fine following these steps:
+    <itemizedlist>
+      <listitem><para>
+	if possible, delete all the slave nodes via <ulink url="https://cloud-areapd.pd.infn.it/dashboard">dashboard</ulink>;
+      </para></listitem>
+      
+      <listitem><para>    
+	switch on the master node as root;
+      </para></listitem>
+      
+      <listitem><para>    
+	check if both condor and elastiq services are already running (i.e in centos release they are enabled)
+	<screen>
+# service condor status
+# service elastiq status
+	</screen>
+	In this case new slaves will be created and will join the cluster in some minutes; 
+      </para></listitem>
+      
+      <listitem><para>    
+	if only condor service is running but elastiq isn't, please restart elastiq with
+	<screen>
+# service elastiq start
+	</screen>
+	or
+	<screen>
+# elastiqctl restart
+	</screen>
+	and wait for the creation of new slaves that will reach the cluster in some minutes;
+      </para></listitem>
+      
+      <listitem><para>    
+	if condor isn't running and some elastiq processes are up and running, kill them with
+	<screen>
+# ps -ef | grep elastiq
+# kill -9 &lt;n_proc&gt;
+	</screen>
+	and start the condor service with
+	<screen>
+# service condor start
+	</screen>
+	now the condor_q command should return
+	<screen>
+<literal># condor_q  </literal>
+-- Schedd:  : &lt;10.64.xx.yyy:zzzzz&gt;
+ ID      OWNER            SUBMITTED     RUN_TIME ST PRI SIZE CMD               
+ 0 jobs; 0 completed, 0 removed, 0 idle, 0 running, 0 held, 0 suspended
+	</screen>
+	and the condor_status command output should be empty (no nodes running) 
+	<screen>
+<literal># condor_status</literal>
+
+	</screen>
+	then start the elastiq service
+	<screen>
+# service elastiq start
+	</screen>
+	in some minutes the minimum number of nodes should reach the condor cluster and the condor_status command output should show them i.e.
+	<screen>
+<literal># condor_status</literal>
+Name               OpSys      Arch   State     Activity LoadAv Mem   ActvtyTime
+slot1@10-64-22-215 LINUX      X86_64 Unclaimed Idle      0.000 1896  0+00:24:46
+slot2@10-64-22-215 LINUX      X86_64 Unclaimed Idle      0.000 1896  0+00:25:05
+slot1@10-64-22-217 LINUX      X86_64 Unclaimed Idle      0.000 1896  0+00:24:44
+slot2@10-64-22-217 LINUX      X86_64 Unclaimed Idle      0.000 1896  0+00:25:05
+slot1@10-64-22-89. LINUX      X86_64 Unclaimed Benchmar  1.000 1896  0+00:00:04
+slot2@10-64-22-89. LINUX      X86_64 Unclaimed Idle      0.040 1896  0+00:00:05
+                     Machines Owner Claimed Unclaimed Matched Preempting
+        X86_64/LINUX        6     0       0         6       0          0
+               Total        6     0       0         6       0          0
+	</screen>
+      </para></listitem>
+    </itemizedlist>  
+  </para>
+  <para>
+    <literal>Check the log files</literal>
+  </para>
+  <para>
+    The log file of elastiq, located in /var/log/elastiq/elastiq.log, is quite difficult to read if you don't know its structure. When you start the elastiq service the first part of log file reports the check of cloud user's credentials and of other parameters configured in the elastiq.conf file (i.e. the userdata file for slave nodes) 
+  </para>
+  <screen>
+INFO [__init__.conf] Configuration: ec2.image_id = ami-9f3da3fc (from file)
+INFO [__init__.conf] Configuration: ec2.flavour = cldareapd.medium (from file)
+INFO [__init__.conf] Configuration: ec2.api_url = https://cloud-areapd.pd.infn.it:8788/services/Cloud (from file)
+2INFO [__init__.conf] Configuration: ec2.aws_secret_access_key = [...] (from file)
+INFO [__init__.conf] Configuration: ec2.key_name = my_key (from file)
+INFO [__init__.conf] Configuration: ec2.user_data_b64 = [...] (from file)
+INFO [__init__.conf] Configuration: ec2.aws_access_key_id = [...] (from file)
+ 
+INFO [__init__.conf] Configuration: quota.max_vms = 3.0 (from file)
+INFO [__init__.conf] Configuration: quota.min_vms = 1.0 (from file)
+NFO [__init__.main] Loaded batch plugin "htcondor"
+DEBUG [htcondor.init] HTCondor plugin initialized
+DEBUG [__init__.main] EC2 image "ami-9f3da3fc" found
+  </screen>
+  <para>
+    if your credentials are wrong you get an error as
+  </para>
+  <screen>
+ERROR [__init__.ec2_running_instances] Can't get list of EC2 instances (maybe wrong credentials?)
+  </screen>
+  <para>
+    instead, if you insert a wrong ami_id for the image of slave nodes you get
+  </para>
+  <screen>
+ERROR [__init__.main] Cannot find EC2 image "ami-00000000"
+  </screen>
+  <para>
+    Elastiq periodically checks all the VMs. If a VM is correctly added to the condor cluster, it logs
+  </para>
+  <screen>
+DEBUG [__init__.ec2_running_instances] Found IP 10.64.22.188 corresponding to instance
+  </screen>
+  <para>
+    otherwise
+  </para>
+  <screen>
+WARNING [__init__.ec2_running_instances] Cannot find instance 10.64.22.216 in the list of known IPs
+WARNING [__init__.ec2_running_instances] Cannot find instance 10.64.22.182 in the list of known IPs
+WARNING [__init__.ec2_running_instances] Cannot find instance 10.64.22.236 in the list of known IPs
+  </screen>
+  <para>
+    When elastiq instantiates a new VM it logs
+  </para>
+  <screen>
+WARNING [__init__.ec2_scale_up] Quota enabled: requesting 1 (out of desired 1) VMs
+INFO [__init__.ec2_scale_up] VM launched OK. Requested: 1/1 | Success: 1 | Failed: 0 | ID: i-f026f340
+DEBUG [__init__.save_owned_instances] Saved list of owned instances: i-f026f340
+  </screen>
+  <para>
+    and when elastiq deletes an idle VM it logs
+  </para>
+  <screen>
+INFO [__init__.check_vms] Host 10-64-22-190.INFN-PD is idle for more than 2400s: requesting shutdown
+INFO [__init__.ec2_scale_down] Requesting shutdown of 1 VMs...
+  </screen>
+  <para>
+    In the master node of condor, logs are located in /var/log/condor/ directory and are easy to read and understand
+  </para>
+  <screen>
+# ls -l /var/log/condor/
+total 76
+-rw-r--r--. 1 condor condor 24371 Jan 18 08:42 CollectorLog
+-rw-r--r--. 1 root   root     652 Jan 18 08:35 KernelTuning.log
+-rw-r--r--. 1 condor condor  2262 Jan 18 08:35 MasterLog
+-rw-r--r--. 1 condor condor     0 Jan 18 08:35 MatchLog
+-rw-r--r--. 1 condor condor 19126 Jan 18 08:42 NegotiatorLog
+-rw-r--r--. 1 root   root   13869 Jan 18 08:42 ProcLog
+-rw-r--r--. 1 condor condor   474 Jan 18 08:35 ScheddRestartReport
+-rw-r--r--. 1 condor condor  2975 Jan 18 08:40 SchedLog
+  </screen>
+  <para>
+    <literal>Check the running processes</literal>
+  </para>
+  <para>
+    Generally running processes are
+    <itemizedlist>
+      <listitem><para>
+	for the condor service:
+	<screen>
+<literal># ps -ef | grep condor</literal>
+condor       764       1  0 14:09 ?        00:00:00 /usr/sbin/condor_master -f
+root         960     764  0 14:09 ?        00:00:00 condor_procd -A /var/run/condor/procd_pipe -L /var/log/condor/ProcLog -R 1000000 -S 60 -C 996
+condor       961     764  0 14:09 ?        00:00:00 condor_collector -f
+condor       974     764  0 14:09 ?        00:00:00 condor_negotiator -f
+condor       975     764  0 14:09 ?        00:00:00 condor_schedd -f	  
+	</screen>
+      </para></listitem>
+      <listitem><para>
+	for the elastiq service:
+	<screen>
+<literal># ps -ef | grep elastiq</literal>
+elastiq      899       1  0 14:09 ?        00:00:00 SCREEN -dmS __|elastiq|__ /bin/sh -c python /usr/bin/elastiq-real.py --logdir=/var/log/elastiq --config=/etc/elastiq.conf --statefile=/var/lib/elastiq/state 2&gt; /var/log/elastiq/elastiq.err
+elastiq      952     899  0 14:09 pts/0    00:00:00 /bin/sh -c python /usr/bin/elastiq-real.py --logdir=/var/log/elastiq --config=/etc/elastiq.conf --statefile=/var/lib/elastiq/state 2&gt; /var/log/elastiq/elastiq.err
+elastiq      953     952  0 14:09 pts/0    00:00:01 python /usr/bin/elastiq-real.py --logdir=/var/log/elastiq --config=/etc/elastiq.conf --statefile=/var/lib/elastiq/state
+	</screen>
+      </para></listitem>
+    </itemizedlist>
+  </para>
+
+  <warning><para>
+    The condor_status information isn't updated as frequently as the check of VM status done by elastiq. It could happen for some minutes the condor_status shows nodes that have been already removed from the cloud by elastiq.
+  </para></warning>
+
+</section>
+
 </chapter>
+
