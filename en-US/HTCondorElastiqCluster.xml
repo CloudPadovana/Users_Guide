@@ -637,33 +637,34 @@ The returned output will be something like:
 
 </section>
 
-<section id="Troubleshooting">
-  <title>How to restart the elastic cluster</title>
+<section id="Restart_the_elastic_cluster">
+  <title>Restart the elastic cluster</title>
   <para>
-    <literal>Check the cluster status</literal>
+   This section describes the steps to be followed to restart the elastic cluster
+   (this might be needed e.g. after a reboot).
   </para>
-  <para>
-    When you restart the elastic cluster you can check that all work fine following these steps:
+
+<para>
     <itemizedlist>
       <listitem><para>
-	if possible, delete all the slave nodes via <ulink url="https://cloud-areapd.pd.infn.it/dashboard">dashboard</ulink>;
+	If possible, delete all the slave nodes via <ulink url="https://cloud-areapd.pd.infn.it/dashboard">dashboard</ulink>;
       </para></listitem>
       
       <listitem><para>    
-	switch on the master node as root;
+	Log on the master node as root;
       </para></listitem>
       
       <listitem><para>    
-	check if both condor and elastiq services are already running (i.e in centos release they are enabled)
+	Check if both condor and elastiq services are already running
 	<screen>
 # service condor status
 # service elastiq status
 	</screen>
-	In this case new slaves will be created and will join the cluster in some minutes; 
+	In this case new slaves will be created and will join the cluster in some minutes.
       </para></listitem>
       
       <listitem><para>    
-	if only condor service is running but elastiq isn't, please restart elastiq with
+	if only condor service is running but elastiq isn't, please restart elastiq using the following command:
 	<screen>
 # service elastiq start
 	</screen>
@@ -671,20 +672,20 @@ The returned output will be something like:
 	<screen>
 # elastiqctl restart
 	</screen>
-	and wait for the creation of new slaves that will reach the cluster in some minutes;
+	and wait for the creation of new slaves that will connect to the cluster in some minutes;
       </para></listitem>
       
       <listitem><para>    
-	if condor isn't running and some elastiq processes are up and running, kill them with
+	If condor isn't running and some elastiq processes are up and running, kill them:
 	<screen>
 # ps -ef | grep elastiq
 # kill -9 &lt;n_proc&gt;
 	</screen>
-	and start the condor service with
+	and start the condor service using the following command:
 	<screen>
 # service condor start
 	</screen>
-	now the condor_q command should return
+	Now the condor_q command should return
 	<screen>
 <literal># condor_q  </literal>
 -- Schedd:  : &lt;10.64.xx.yyy:zzzzz&gt;
@@ -696,11 +697,11 @@ The returned output will be something like:
 <literal># condor_status</literal>
 
 	</screen>
-	then start the elastiq service
+	Then start the elastiq service
 	<screen>
 # service elastiq start
 	</screen>
-	in some minutes the minimum number of nodes should reach the condor cluster and the condor_status command output should show them i.e.
+	In some minutes the minimum number of nodes should connect to the condor cluster and the condor_status command output should show them e.g.:
 	<screen>
 <literal># condor_status</literal>
 Name               OpSys      Arch   State     Activity LoadAv Mem   ActvtyTime
@@ -717,11 +718,20 @@ slot2@10-64-22-89. LINUX      X86_64 Unclaimed Idle      0.040 1896  0+00:00:05
       </para></listitem>
     </itemizedlist>  
   </para>
+
+</section>
+
+
+<section id="Troubleshooting_the_elastic_cluster">
+  <title>Troubleshooting the elastic cluster</title>
+
+
+
   <para>
     <literal>Check the log files</literal>
   </para>
   <para>
-    The log file of elastiq, located in /var/log/elastiq/elastiq.log, is quite difficult to read if you don't know its structure. When you start the elastiq service the first part of log file reports the check of cloud user's credentials and of other parameters configured in the elastiq.conf file (i.e. the userdata file for slave nodes) 
+    The elastiq log file is /var/log/elastiq/elastiq.log. It is not straightforward to interpret it without knowing its structure. When you start the elastiq service the first part of log file reports the check of cloud user's credentials and of other parameters configured in the elastiq.conf file (i.e. the userdata file for slave nodes) 
   </para>
   <screen>
 INFO [__init__.conf] Configuration: ec2.image_id = ami-9f3da3fc (from file)
@@ -739,25 +749,25 @@ DEBUG [htcondor.init] HTCondor plugin initialized
 DEBUG [__init__.main] EC2 image "ami-9f3da3fc" found
   </screen>
   <para>
-    if your credentials are wrong you get an error as
+    if your credentials are wrong, you will see in the log file an error as:
   </para>
   <screen>
 ERROR [__init__.ec2_running_instances] Can't get list of EC2 instances (maybe wrong credentials?)
   </screen>
   <para>
-    instead, if you insert a wrong ami_id for the image of slave nodes you get
+    If you specified a wrong ami_id for the image of slave nodes, the error message in the log will be:
   </para>
   <screen>
 ERROR [__init__.main] Cannot find EC2 image "ami-00000000"
   </screen>
   <para>
-    Elastiq periodically checks all the VMs. If a VM is correctly added to the condor cluster, it logs
+    Elastiq periodically checks all the VMs. If a VM is correctly added to the condor cluster, it logs:
   </para>
   <screen>
 DEBUG [__init__.ec2_running_instances] Found IP 10.64.22.188 corresponding to instance
   </screen>
   <para>
-    otherwise
+    otherwise something like:
   </para>
   <screen>
 WARNING [__init__.ec2_running_instances] Cannot find instance 10.64.22.216 in the list of known IPs
@@ -765,7 +775,7 @@ WARNING [__init__.ec2_running_instances] Cannot find instance 10.64.22.182 in th
 WARNING [__init__.ec2_running_instances] Cannot find instance 10.64.22.236 in the list of known IPs
   </screen>
   <para>
-    When elastiq instantiates a new VM it logs
+    When elastiq instantiates a new VM it logs something like:
   </para>
   <screen>
 WARNING [__init__.ec2_scale_up] Quota enabled: requesting 1 (out of desired 1) VMs
@@ -773,14 +783,15 @@ INFO [__init__.ec2_scale_up] VM launched OK. Requested: 1/1 | Success: 1 | Faile
 DEBUG [__init__.save_owned_instances] Saved list of owned instances: i-f026f340
   </screen>
   <para>
-    and when elastiq deletes an idle VM it logs
+    and when elastiq deletes an idle VM it logs:
   </para>
   <screen>
 INFO [__init__.check_vms] Host 10-64-22-190.INFN-PD is idle for more than 2400s: requesting shutdown
 INFO [__init__.ec2_scale_down] Requesting shutdown of 1 VMs...
   </screen>
   <para>
-    In the master node of condor, logs are located in /var/log/condor/ directory and are easy to read and understand
+    In the master node of condor, logs are located in /var/log/condor directory. You may refer to the HTCondor 
+    documentation for more information on these log files.
   </para>
   <screen>
 # ls -l /var/log/condor/
@@ -798,7 +809,7 @@ total 76
     <literal>Check the running processes</literal>
   </para>
   <para>
-    Generally running processes are
+    Processes expected to run are:
     <itemizedlist>
       <listitem><para>
 	for the condor service:
@@ -824,10 +835,10 @@ elastiq      953     952  0 14:09 pts/0    00:00:01 python /usr/bin/elastiq-real
   </para>
 
   <warning><para>
-    The condor_status information isn't updated as frequently as the check of VM status done by elastiq. It could happen for some minutes the condor_status shows nodes that have been already removed from the cloud by elastiq.
+    The condor_status information isn't updated very frequently. So it can happen that condor_status shows nodes that have been already removed from the cloud by elastiq.
   </para></warning>
 
 </section>
 
 </chapter>
-
+
