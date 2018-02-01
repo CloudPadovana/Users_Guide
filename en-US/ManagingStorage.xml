@@ -326,15 +326,42 @@ rpcbind
 </para>
 
 <para>
-Insert the correct export directive in the /etc/exports file. For example 
-if the volume must be visible to 
+Insert the correct export directive in the /etc/exports file. 
+</para>
+
+<para>
+For example 
+if the volume must be visible in read-only to 
 all the virtual machines of the same subnet 10.64.15.* (check the subnet with 
 the <command>ifconfig</command> command) the content of the /etc/exports file 
 should be:
 <screen>
-/dataNfs 10.62.15.*(async,rw,no_root_squash)
+/dataNfs 10.62.15.*(ro,no_root_squash) 
 </screen>
 </para>
+
+<para>
+If the volume must be visible in read-write to all the virtual machines of the same subnet 10.64.15.*, you
+might export it using the async or sync option. 
+In short: async is much faster wrt sync, but can lead to data corruption if the server crashes during write operations
+(async means that the NFS server will acknowledge data 
+before it's committed to disk, while sync does the opposite: the server will only acknowledge data after it's written out).
+</para>
+
+<para>
+To export a volume using the async option the /etc/exports will be something like:
+<screen>
+/dataNfs 10.62.15.*(async,rw,no_root_squash) 
+</screen>
+</para>
+
+<para>
+To export a volume using the sync option the /etc/exports will be something like:
+<screen>
+/dataNfs 10.62.15.*(sync,rw,no_root_squash) 
+</screen>
+</para>
+
 
 <para>
 Check the firewall on the virtual machine. Ensure that the other instances
