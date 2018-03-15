@@ -345,7 +345,10 @@ If the volume must be visible in read-write to all the virtual machines of the s
 might export it using the async or sync option. 
 In short: async is much faster wrt sync, but can lead to data corruption if the server crashes during write operations
 (async means that the NFS server will acknowledge data 
-before it's committed to disk, while sync does the opposite: the server will only acknowledge data after it's written out).
+before it's committed to disk, while sync does the opposite: the server will only acknowledge data after it's written out). Sync can be slow in particular
+when you have to write many files, since the open()/creat() 
+and close() system calls have to wait for the new data to hit disk.
+
 </para>
 
 <para>
