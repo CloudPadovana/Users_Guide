@@ -388,6 +388,54 @@ Purging configuration files for wget (1.15-1ubuntu1.14.04.1) ...
    </orderedlist>
 </para>
 </section>
+
+<section id="Mathematica"><title>Install Mathematica (for INFN Padova users)</title>
+
+<para>
+INFN-Padova users can follow these instructions to install Mathematica on their Linux box.
+</para>
+
+<para>
+First of all log as root on your VM and mount the directory where the installation kit is available:
+
+<screen>
+# mount hellgate.pd.infn.it:/sw/linux mnt/
+</screen>
+
+
+Go to the relevant directory and launch the installer:
+
+<screen>
+cd mnt/Mathematica/&lt;version&gt;/Installer/
+./MathInstaller
+</screen>
+
+
+The installer will ask the target installation directory (the default is 
+/usr/local/Wolfram/Mathematica/&lt;version&gt;) and the directory where the executables will be linked
+(default /usr/local/bin).
+</para>
+
+<para>
+Finally create the file /usr/local/Wolfram/Mathematica/&lt;version&gt;/Configuration/Licensing/mathpass with the following 
+content:
+
+<screen>
+!mathlm.pd.infn.it
+</screen>
+
+</para>
+
+<para>
+That's all! You can now umount the /mnt directory:
+
+<screen>
+cd ; umount /mnt 
+</screen>
+</para>
+
+
+</section>
 </section>
 
 <section><title>Adding a user to your VM</title>
